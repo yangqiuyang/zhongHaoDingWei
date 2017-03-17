@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="none"
+        android:id="@+id/nav_group">
+        <item
+            android:id="@+id/my_devices"
+            android:icon="@drawable/ic_my_devices_black_24dp"
+            android:title="我的设备" >
+        </item>
+        <item
+            android:id="@+id/nav_move_locus"
+            android:icon="@drawable/ic_move_locus_black_24dp"
+            android:title="轨迹查询" />
+        <item
+            android:id="@+id/nav_user_home"
+            android:icon="@drawable/ic_user_home"
+            android:title="个人中心" />
+
+        <item
+            android:id="@+id/nav_business_server"
+            android:title="服务商信息"
+            android:icon="@drawable/ic_business_black_24dp"
+            />
+    <item
+        android:id="@+id/about_us"
+        android:icon="@drawable/ic_about_our_24dp"
+        android:title="关于" />
+        <item
+            android:id="@+id/nav_update"
+            android:icon="@drawable/ic_file_download_black_24dp"
+            android:title="检查更新" />
+    </group>
+</menu>
+
+

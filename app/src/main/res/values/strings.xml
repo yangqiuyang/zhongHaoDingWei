@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">中浩定位</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="time">2016-12-28</string>
+
+    <string name="action_settings">设置</string>
+    <string name="title_activity_login">中浩定位</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">用户名</string>
+    <string name="prompt_password">密码</string>
+    <string name="action_sign_in">登录</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">用户名不正确</string>
+    <string name="error_invalid_password">密码太短</string>
+    <string name="error_incorrect_password">密码不正确</string>
+    <string name="error_field_required">用户名不能为空</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+    <string name="title_activity_map">中浩定位</string>
+    <string name="title_activity_message">预警信息</string>
+    <string name="warning_txt">是否在通知栏显示预警信息</string>
+    <string name="edit_text">编辑</string>
+    <string name="complete_text">完成</string>
+</resources>
