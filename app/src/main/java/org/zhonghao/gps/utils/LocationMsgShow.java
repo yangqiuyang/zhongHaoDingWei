@@ -91,6 +91,7 @@ public class LocationMsgShow {
     public static void getRouteMsg(final Context context, int position, final Marker marker, final BaiduMap mBaiduMap, final double latitude, double longitude) {
         final LayoutInflater inflater=LayoutInflater.from(context);
         final LatLng latLng=new LatLng(latitude,longitude);
+        //poi
         GeoCoder geoCoder=GeoCoder.newInstance();
         geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(latLng));
         final Boolean[] flags = {false};

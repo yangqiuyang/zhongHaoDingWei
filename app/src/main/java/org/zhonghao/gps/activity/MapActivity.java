@@ -381,13 +381,14 @@ public class MapActivity extends AppCompatActivity
         int position = extraInfo.getInt("position");
         double latitude=extraInfo.getDouble("latitude");
         double longitude= extraInfo.getDouble("longitude");
+        Log.i("makerType",makerType+"");
         switch (makerType){
-            case 0x11://集装箱定位
+            case 11://集装箱定位
               LocationMsgShow.getLocationMsg(MapActivity.this,marker,mBaiduMap,position);
                 break;
-            default://路线定位信息
+            /*default://路线定位信息
               LocationMsgShow.getRouteMsg(MapActivity.this,position,marker,mBaiduMap,latitude,longitude);
-                break;
+                break;*/
         }
         return true;
     }

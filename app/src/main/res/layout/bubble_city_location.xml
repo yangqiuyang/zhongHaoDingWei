@@ -10,7 +10,7 @@
     android:paddingRight="16dp"
     app:bl_cornersRadius="10dip"
     app:bl_arrowHeight="10dp"
-    app:bl_arrowPosition="50dp"
+    app:bl_arrowPosition="100dp"
     app:bl_arrowWidth="16dp"
     app:bl_arrowDirection="bottom">
     <LinearLayout
