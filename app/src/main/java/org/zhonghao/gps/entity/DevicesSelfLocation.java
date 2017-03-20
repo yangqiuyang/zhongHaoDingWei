@@ -3,7 +3,7 @@ package org.zhonghao.gps.entity;
 import java.util.List;
 
 /**
- * Created by Administrator on 2017/3/17.
+ * Created by Administrator on 2017/huoche/17.
  */
 
 public class DevicesSelfLocation {

@@ -12,7 +12,7 @@ import org.zhonghao.gps.R;
 import org.zhonghao.gps.utils.WarnIPopupWindow;
 
 /**
- * Created by Administrator on 2017/3/15.
+ * Created by Administrator on 2017/huoche/15.
  */
 
 public class ToggleText extends TextView {

@@ -16,7 +16,7 @@ import android.widget.PopupWindow;
 import org.zhonghao.gps.R;
 
 /**
- * Created by Administrator on 2017/3/14.
+ * Created by Administrator on 2017/huoche/14.
  */
 
 public class WarnIPopupWindow extends PopupWindow {
@@ -39,8 +39,8 @@ public class WarnIPopupWindow extends PopupWindow {
         setContentView(view);
         setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
         setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        setOutsideTouchable(true);
-        setBackgroundDrawable(new ColorDrawable(Color.GRAY));//设置窗体背景色
+        /*setOutsideTouchable(true);
+        setBackgroundDrawable(new ColorDrawable(Color.GRAY));//设置窗体背景色*/
     }
     public void show(View view){
          setAnimationStyle(R.style.pop_show);

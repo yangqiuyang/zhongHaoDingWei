@@ -256,6 +256,7 @@ public class ServelBiz {
                     }
                 }
                 MyApplication.devicesInfo=deMsg.get(0);
+                handler.sendEmptyMessage(0x11);
             }
         }, new Response.ErrorListener() {
             @Override

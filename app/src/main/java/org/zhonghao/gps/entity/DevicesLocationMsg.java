@@ -1,7 +1,7 @@
 package org.zhonghao.gps.entity;
 
 /**
- * Created by Administrator on 2017/3/17.
+ * Created by Administrator on 2017/huoche/17.
  */
 
 public class DevicesLocationMsg {

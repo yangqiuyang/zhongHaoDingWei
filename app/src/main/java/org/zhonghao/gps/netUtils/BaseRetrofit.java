@@ -8,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 
 /**
- * Created by Administrator on 2017/3/15.
+ * Created by Administrator on 2017/huoche/15.
  */
 //封装成单例模式，网络请求
 public class BaseRetrofit {
