@@ -30,7 +30,6 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONObject;
 import org.zhonghao.gps.R;
 import org.zhonghao.gps.customView.ToggleText;
-import org.zhonghao.gps.netUtils.BaseRetrofit;
 import org.zhonghao.gps.utils.Urls;
 import org.zhonghao.gps.utils.WarnIPopupWindow;
 

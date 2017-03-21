@@ -5,18 +5,17 @@ import android.os.Handler;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.model.LatLng;
-
-import org.xutils.x;
 
 import java.util.ArrayList;
 
+import org.xutils.x;
 import org.zhonghao.gps.entity.DevicesInfo;
 import org.zhonghao.gps.entity.DevicesLocationMsg;
 import org.zhonghao.gps.entity.DevicesSelfLocation;
 import org.zhonghao.gps.entity.NameDates;
 import org.zhonghao.gps.entity.UserInfo;
-import org.zhonghao.gps.netUtils.BaseRetrofit;
 
 /**
  * Created by lenovo on 2016/11/28.
@@ -43,9 +42,8 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        SDKInitializer.initialize(this);
         x.Ext.init(this);
-        //初始化Retrofit
-        BaseRetrofit.init();
     }
 
 

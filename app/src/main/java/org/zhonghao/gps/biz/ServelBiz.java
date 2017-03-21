@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.zhonghao.gps.activity.MoveLocusActivity;
 import org.zhonghao.gps.application.MyApplication;
 import org.zhonghao.gps.entity.DevicesInfo;
 import org.zhonghao.gps.entity.DevicesLocationMsg;
@@ -42,8 +43,9 @@ import org.zhonghao.gps.entity.RequestDevices;
 import org.zhonghao.gps.entity.RequestQueryDevicesMoveInfo;
 import org.zhonghao.gps.entity.ResponseDevicesMove;
 import org.zhonghao.gps.entity.ResponseUserinfo;
-import org.zhonghao.gps.netUtils.MyJsonResponse;
 import org.zhonghao.gps.utils.Constants;
+import org.zhonghao.gps.utils.MyJsonResponse;
+import org.zhonghao.gps.utils.ProgressUtils;
 import org.zhonghao.gps.utils.Urls;
 
 /**
@@ -53,7 +55,7 @@ import org.zhonghao.gps.utils.Urls;
 public class ServelBiz {
 
     public static DevicesInfo.LoginResponse LoginBiz(ResponseUserinfo responseUserinfo, Context context) {
-        Log.d("serve", "LoginBiz: 进入了");
+       // Log.d("serve", "LoginBiz: 进入了");
         URL url;
         HttpURLConnection connection;
         Gson gson = new Gson();
@@ -71,7 +73,7 @@ public class ServelBiz {
             //上传用户信息
             DataOutputStream out = new DataOutputStream(connection.getOutputStream());
             out.writeBytes(jsonDate);
-            Log.d("serve", "loginBiz:得到的conn" + connection.getResponseCode());
+           // Log.d("serve", "loginBiz:得到的conn" + connection.getResponseCode());
             if (connection.getResponseCode() == 200) {
                 BufferedReader bf = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
                 StringBuilder sb = new StringBuilder();
@@ -81,25 +83,12 @@ public class ServelBiz {
                     sb.append(line);
                 }
                 String response = sb.toString();
-                Log.d("serve", "123loginBiz:得到的jason" + response);
+               // Log.d("serve", "123loginBiz:得到的jason" + response);
                 DevicesInfo.LoginResponse loginResponse = gson.fromJson(response, DevicesInfo.LoginResponse.class);
-//                Log.d("serve", "" + loginResponse.getMessage());
-//                Log.d("serve", "" + loginResponse.getState());
-//                Log.d("serve", "" + loginResponse.getDevices().get(1));
-//LWH
-
-                /*ArrayList<DevicesInfo> deviceList = loginResponse.getDevices();
-                for (int i = 0; i < deviceList.size(); i++){
-                    DevicesInfo device = new DevicesInfo();
-                    device.setDeviceID(deviceList.get(i).getDeviceID());
-                    device.setDeviceName(deviceList.get(i).getDeviceName());
-                    deviceList.add(device);
-                }
-                loginResponse.setDevices(deviceList);*/
 
                 JSONObject jsonObject1 = new JSONObject(response);
                 JSONArray deviceArr = jsonObject1.getJSONArray("devices");
-                Log.d("device", deviceArr.toString());
+             //   Log.d("device", deviceArr.toString());
                 ArrayList<DevicesInfo> deviceList = new ArrayList();
                 for (int i = 0; i < deviceArr.length(); i++){
                     JSONObject jsonObject = (JSONObject) deviceArr.get(i);
@@ -110,7 +99,7 @@ public class ServelBiz {
                 }
                 loginResponse.setDevices(deviceList);
 
-                Log.d("serve", "得到的User Info是=====" + gson.toJson(loginResponse.getUserinfo()));
+              //  Log.d("serve", "得到的User Info是=====" + gson.toJson(loginResponse.getUserinfo()));
 
                 MyApplication.myUserInnfo = loginResponse.getUserinfo();
                 return loginResponse;
@@ -118,7 +107,7 @@ public class ServelBiz {
                 MyApplication.responseState = false;
             }
         } catch (Exception e) {
-            Log.d("serve", "j进入catch" + e.toString());
+          //  Log.d("serve", "j进入catch" + e.toString());
             MyApplication.responseState = false;
             e.printStackTrace();
             return null;
@@ -128,26 +117,25 @@ public class ServelBiz {
         return null;
     }
 
-    public static ArrayList<DevicesInfo> getDvices(RequestDevices requestDevices, Context context, Handler handler) {
-        URL url;
-        HttpURLConnection connection;
+    public static void getDvices(RequestDevices requestDevices, Context context, final Handler handler) {
+       /* HttpURLConnection connection;
         Gson gson = new Gson();
+        URL url;
         ArrayList<DevicesInfo> list = new ArrayList<DevicesInfo>();
         try {
-            //url = new URL("http://117.158.206.86:8681/NewGPSTrace2.0/app/appDevicedetail.do");
-            url = new URL("http://gps.zhonghaokeji.cn/NewGPSTrace2.0/app/appDevicedetail.do");
+            url=new URL(Urls.DEVICE_DETAIL);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("charset", "UTF-8");
             String jsonDate = gson.toJson(requestDevices);
-            Log.d("serve", "123456loginBiz:发出的" + jsonDate);
+         //   Log.d("serve", "123456loginBiz:发出的" + jsonDate);
             connection.setDoOutput(true);
             connection.setReadTimeout(5000);
             connection.setConnectTimeout(5000);
             DataOutputStream out = new DataOutputStream(connection.getOutputStream());
             out.writeBytes(jsonDate);
             if (connection.getResponseCode() == 200) {
-                Log.d("serve", "456loginBiz:得到的conn" + connection.getResponseCode());
+             //   Log.d("serve", "456loginBiz:得到的conn" + connection.getResponseCode());
                 BufferedReader bf = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
                 StringBuilder sb = new StringBuilder();
                 String line;
@@ -161,7 +149,6 @@ public class ServelBiz {
                     DevicesInfo deviceInfo = gson.fromJson(obj.toString(), DevicesInfo.class);
                     list.add(deviceInfo);
                 }
-                Log.d("serve", "loginBiz:得到的jason" + response);
                 Message msg = handler.obtainMessage();
                 msg.what = 1;
                 Bundle bundle = new Bundle();
@@ -175,14 +162,43 @@ public class ServelBiz {
         }finally {
             return list;
 
-        }
+        }*/
+        final ArrayList<DevicesInfo> list = new ArrayList<DevicesInfo>();
+        Gson gson = new Gson();
+        String jsonDate = gson.toJson(requestDevices);
+        RequestQueue queue= Volley.newRequestQueue(context);
+        MyJsonResponse res=new MyJsonResponse(Urls.DEVICE_DETAIL, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+                        JSONObject object = response.getJSONObject(i);
+                        DevicesInfo deviceInfo = new Gson().fromJson(object.toString(),DevicesInfo.class);
+                        list.add(deviceInfo);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                Message msg = handler.obtainMessage();
+                msg.what = 1;
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("list",list);
+                msg.setData(bundle);
+                handler.sendMessage(msg);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                handler.sendEmptyMessage(5);
+            }
+        },jsonDate);
+        queue.add(res);
     }
-    public static ResponseDevicesMove getDvicesMoveLocus(RequestQueryDevicesMoveInfo requestDevicesMove, Context context, Handler handler) {
-        URL url;
+    public static void getDvicesMoveLocus(RequestQueryDevicesMoveInfo requestDevicesMove, Context context, final Handler handler) {
+        /*URL url;
         HttpURLConnection connection;
         Gson gson = new Gson();
         ArrayList<ResponseDevicesMove> list = new ArrayList<>();
-
         ResponseDevicesMove responseDevicesMove = new ResponseDevicesMove();
         try {
             url = new URL("http://gps.zhonghaokeji.cn/NewGPSTrace2.0/app/appDeviceRoute.do");
@@ -196,7 +212,7 @@ public class ServelBiz {
             connection.setConnectTimeout(10000);
             DataOutputStream out = new DataOutputStream(connection.getOutputStream());
             out.writeBytes(jsonDate);
-            Log.d("serve", "456loginBiz:得到的conn" + connection.getResponseCode());
+          //  Log.d("serve", "456loginBiz:得到的conn" + connection.getResponseCode());
             if (connection.getResponseCode() == 200) {
                 BufferedReader bf = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
                 StringBuilder sb = new StringBuilder();
@@ -211,7 +227,7 @@ public class ServelBiz {
                     list.add(gson.fromJson(obj.toString(),ResponseDevicesMove.class));
                 }
                 responseDevicesMove = list.get(0);
-                Log.d("serve", "loginBiz:得到的jason" + response);
+              //  Log.d("serve", "loginBiz:得到的jason" + response);
                 if (requestDevicesMove != null) {
                     Message msg = handler.obtainMessage();
                     msg.what = 2;
@@ -226,7 +242,39 @@ public class ServelBiz {
             e.printStackTrace();
             handler.sendEmptyMessage(5);
         }
-        return null;
+        return null;*/
+        final Gson gson = new Gson();
+        final ArrayList<ResponseDevicesMove> list = new ArrayList<>();
+        RequestQueue queue= Volley.newRequestQueue(context);
+        String jsonDate = gson.toJson(requestDevicesMove);
+        MyJsonResponse res=new MyJsonResponse(Urls.DEVICE_ROUTE, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+                        JSONObject obj = response.getJSONObject(i);
+                        list.add(gson.fromJson(obj.toString(),ResponseDevicesMove.class));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                //  Log.d("serve", "loginBiz:得到的jason" + response);
+                if (list.get(0) != null) {
+                    Message msg = handler.obtainMessage();
+                    msg.what = 2;
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("response", list.get(0));
+                    msg.setData(bundle);
+                    handler.sendMessage(msg);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                handler.sendEmptyMessage(5);
+            }
+        },jsonDate);
+        queue.add(res);
     }
 
     //设备定位信息请求
@@ -244,6 +292,7 @@ public class ServelBiz {
         devices.setUserinfo(userinfo);
         String json = new Gson().toJson(devices);
         RequestQueue queue= Volley.newRequestQueue(context);
+        ProgressUtils.showProgress(context);
         MyJsonResponse res=new MyJsonResponse(Urls.BASE_URL + Urls.SELF_DEVICE_LOCATION, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {

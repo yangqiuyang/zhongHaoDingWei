@@ -5,10 +5,10 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
     <TextView
-        android:gravity="left|center"
+        android:gravity="center"
         android:text="TextView"
         android:layout_width="match_parent"
-        android:layout_height="32dp"
+        android:layout_height="50dp"
         android:id="@+id/tv_devicesnum"
         android:clickable="true"
         />

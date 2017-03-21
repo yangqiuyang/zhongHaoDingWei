@@ -2,75 +2,98 @@
 <com.daasuu.bl.BubbleLayout  xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/bubb"
-    android:layout_width="256dp"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="12dp"
     android:paddingTop="16dp"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     app:bl_cornersRadius="10dip"
     app:bl_arrowHeight="10dp"
-    app:bl_arrowPosition="90dp"
+    app:bl_arrowPosition="125dp"
     app:bl_arrowWidth="16dp"
     app:bl_arrowDirection="bottom"
     app:bl_bubbleColor="#ffffff">
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="center"
+        >
         <TextView
-            android:text="发送时间: SendTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:text="@string/container_msg"
+            android:layout_marginBottom="5dp"
+            />
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="24dp"
-            android:id="@+id/tv_send_time"/>
+            android:id="@+id/tv_send_time"
+            android:gravity="left"
+            />
         <TextView
-            android:text="用户名:userName"
             android:layout_width="match_parent"
             android:layout_height="24dp"
             android:id="@+id/tv_user_name"
+            android:gravity="left"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:id="@+id/tv_container_type"
+            android:gravity="left"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:id="@+id/tv_route_type"
+            android:gravity="left"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:id="@+id/tv_devicesnum"
+            android:gravity="left"
             />
 
         <TextView
-            android:text="集装箱类型: containerType"
             android:layout_width="match_parent"
             android:layout_height="24dp"
-            android:id="@+id/tv_container_type" />
+            android:id="@+id/tv_container_id"
+            android:gravity="left"
+            />
         <TextView
-            android:text="线路类型: routeType"
             android:layout_width="match_parent"
             android:layout_height="24dp"
-            android:id="@+id/tv_route_type" />
+            android:id="@+id/tv_train_id"
+            android:gravity="left"
+            />
         <TextView
-            android:text="设备号: deviceID"
             android:layout_width="match_parent"
             android:layout_height="24dp"
-            android:id="@+id/tv_devicesnum" />
-
+            android:id="@+id/tv_Latitude_id"
+            android:gravity="left"
+            />
         <TextView
-            android:text="集装箱号: containerId"
             android:layout_width="match_parent"
             android:layout_height="24dp"
-            android:id="@+id/tv_container_id" />
+            android:id="@+id/tv_Longtitude_id"
+            android:gravity="left"
+            />
         <TextView
-            android:text="班列号: trainId"
             android:layout_width="match_parent"
-            android:layout_height="24dp"
-            android:id="@+id/tv_train_id" />
-        <TextView
-            android:text="经度: latLngId"
-            android:layout_width="match_parent"
-            android:layout_height="24dp"
-            android:id="@+id/tv_Latitude_id" />
-        <TextView
-            android:text="经度: latLngId"
-            android:layout_width="match_parent"
-            android:layout_height="24dp"
-            android:id="@+id/tv_Longtitude_id" />
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_address_id"
+            android:gravity="left"
+            />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#cccccc">
+            android:background="#cccccc"
+            >
         </LinearLayout>
         <Button
             android:id="@+id/btn_query"

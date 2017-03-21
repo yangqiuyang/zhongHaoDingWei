@@ -11,4 +11,9 @@ public class Urls {
     public static String WARNING_URL="/NewGPSTrace2.0/app/getwarning.do";
     //集装箱设备定位:
     public static String SELF_DEVICE_LOCATION="/NewGPSTrace2.0/app/appDevicedetail.do";
+    //设备信息请求
+    public static String DEVICE_DETAIL="http://gps.zhonghaokeji.cn/NewGPSTrace2.0/app/appDevicedetail.do";
+    //设备路线定位
+    public static String DEVICE_ROUTE="http://gps.zhonghaokeji.cn/NewGPSTrace2.0/app/appDeviceRoute.do";
+
 }

@@ -3,9 +3,12 @@ package org.zhonghao.gps.activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -27,11 +30,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
 import com.baidu.location.LocationClient;
 import com.baidu.mapapi.SDKInitializer;
-import com.baidu.mapapi.common.BaiduMapSDKException;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
@@ -40,6 +40,7 @@ import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.Marker;
+import com.baidu.mapapi.map.UiSettings;
 import com.baidu.mapapi.model.LatLng;
 
 import org.zhonghao.gps.R;
@@ -53,34 +54,25 @@ import org.zhonghao.gps.entity.DevicesInfo;
 import org.zhonghao.gps.entity.RequestDevices;
 import org.zhonghao.gps.entity.ResponseDevicesMove;
 import org.zhonghao.gps.entity.UpdateInfo;
-import org.zhonghao.gps.netUtils.MyJsonResponse;
-import org.zhonghao.gps.utils.LocationMsgShow;
+import org.zhonghao.gps.biz.LocationMsgShow;
+import org.zhonghao.gps.utils.ProgressUtils;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import cn.bingoogolapple.badgeview.BGABadgeImageView;
 
 public class MapActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, BaiduMap.OnMarkerClickListener {
-    MapView mapView = null;
+        implements NavigationView.OnNavigationItemSelectedListener,  BaiduMap.OnMarkerClickListener {
+
     BaiduMap mBaiduMap = null;
-    RelativeLayout rlt = null;
     DevicesInfo.LoginResponse loginResponse = null;
-    ListView listView;
-    TextView username, introduce;
+    TextView username;
     RequestDevices requestDevices = null;
     ArrayList<DevicesInfo> devicesInfos = null;
-    LocationClient locationClient = null;
-    BitmapDescriptor bitmap;
-    ImageButton location;
     ResponseDevicesMove responseDevicesMove = null;
     MyApplication myApplication;
-    DrawerLayout drawer;
-    BGABadgeImageView message;
-    boolean mIsShow = true;
-    public static ProgressBar mapLogin;
     int myposition = 0;
     Handler handler = new Handler() {
         @Override
@@ -90,28 +82,21 @@ public class MapActivity extends AppCompatActivity
                 int msgId = msg.what;
                 Bundle bundle = msg.getData();
                 switch (msgId) {
-
                     case 1:
                         devicesInfos = (ArrayList<DevicesInfo>) bundle.get("list");
-//                      //   Toast.makeText(MapActivity.this, "id===" + devicesInfos.get(0).getSendTime(), Toast.LENGTH_SHORT).show();
-                       // Log.d("serve", "进入了handler" + devicesInfos.get(0).getDeviceID());
                         MapBiz.startMap(devicesInfos.get(0), mapView, mBaiduMap,MapActivity.this, bitmap,myposition);
-                        mapLogin.setVisibility(View.GONE);
                         break;
                     case 2:
-                        mapLogin.setVisibility(View.VISIBLE);
-
+                        ProgressUtils.showProgress(MapActivity.this);
                         responseDevicesMove = (ResponseDevicesMove) bundle.get("response");
-                        //Log.d("serve", "进入了handler" + responseDevicesMove.getContainerIds());
-                        try {
-                            MapBiz.moveLocusService(responseDevicesMove, mapView,  mBaiduMap, MapActivity.this,handler);
+                          try {
+                              MapBiz.moveLocusService(responseDevicesMove, mapView,  mBaiduMap, MapActivity.this,handler);
                         } catch (Exception e) {
                             e.printStackTrace();
-                            mapLogin.setVisibility(View.GONE);
+                            ProgressUtils.hideProgress();
 
                         }
-
-                        mapLogin.setVisibility(View.GONE);
+                        ProgressUtils.hideProgress();
                         break;
                     case 3:
                         Intent intent = new Intent(MapActivity.this, LoginActivity.class);
@@ -119,15 +104,14 @@ public class MapActivity extends AppCompatActivity
                         finish();
                         break;
                     case 4:
-                   // 判断服务器上的版本是不是最新的
+                        // 判断服务器上的版本是不是最新的
                         String currntVersion = Tools
                                 .getCurrentVersion(getApplicationContext());
                         final UpdateInfo info = (UpdateInfo) bundle
                                 .getSerializable("versionEntity");
                         String serverApkVersion = info.getVersion();
-                      //  Log.i("update", serverApkVersion);
-                   //     Log.i("logcal", currntVersion);
-           //                            if (!(serverApkVersion.equals(currntVersion))) {
+                        Log.i("update", serverApkVersion);
+                        Log.i("logcal", currntVersion);
                         if (Double.parseDouble(serverApkVersion) > Double.parseDouble(currntVersion)) {
                             AlertDialog.Builder dialog = new AlertDialog.Builder(MapActivity.this);
                             dialog.setMessage(info.getDescription());
@@ -148,75 +132,48 @@ public class MapActivity extends AppCompatActivity
                         }
                         break;
                     case 5:
-                        mapLogin.setVisibility(View.GONE);
                         Toast.makeText(MapActivity.this,"网络状况不佳，休息一下再试吧",Toast.LENGTH_SHORT).show();
-                    case 6:
-                        mapLogin.setVisibility(View.VISIBLE);
-                        break;
+                        ProgressUtils.hideProgress();
                     case 7:
                         Toast.makeText(MapActivity.this,"该设备还没有信息哦",Toast.LENGTH_SHORT).show();
+                        ProgressUtils.hideProgress();
                         break;
                     case 0x11:
                         MapBiz.startMap(MyApplication.devicesInfo, mapView, mBaiduMap, MapActivity.this, bitmap,myposition);
                         drawer.closeDrawer(GravityCompat.END);
+                        ProgressUtils.hideProgress();
                         break;
 
                 }
 
             } catch (Exception e) {
-                Log.d("serve", "进入了handler" + e.toString());
-                mapLogin.setVisibility(View.GONE);
                 Toast.makeText(MapActivity.this,"出错了，稍后再试吧",Toast.LENGTH_SHORT).show();
 
             }
         }
     };
-
-    //警铃通知
-   /* @BindView(R.id.alarm_bell_map)
-    ImageView alarmBell;*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
-        SDKInitializer.initialize(getApplicationContext());
         setContentView(R.layout.activity_map);
         ButterKnife.bind(this);
-        mapLogin = (ProgressBar) findViewById(R.id.map_progress);
+        initToolBar();
+        initMap();
+        initListView();
+        initDrawer();
         //jieshou登陆页面传入数据
         Intent intent = this.getIntent();
         loginResponse = (DevicesInfo.LoginResponse) intent.getSerializableExtra("loginResponse");
-        listView = (ListView) findViewById(R.id.lv_device_list);
-        listView.setAdapter(new ListViewAdapter(this, loginResponse));
         myApplication = (MyApplication) this.getApplicationContext();
-        MyOnItemOnClickListener listener = new MyOnItemOnClickListener();
         myApplication.setMyHandler(handler);
-        bitmap = BitmapDescriptorFactory
-                .fromResource(R.drawable.map_mark);
-        listView.setOnItemClickListener(listener);
-        listView.setEmptyView(findViewById(R.id.tv_nomore));
+    }
 
-        rlt = (RelativeLayout) findViewById(R.id.rl_message);
-        mapView = (MapView) findViewById(R.id.bmapView);
-        mapView.showZoomControls(false);
-        mapView.showScaleControl(false);
-        mBaiduMap = mapView.getMap();
-        mBaiduMap.setMyLocationEnabled(true);
-        //普通地图
-        mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
-        mBaiduMap.setMaxAndMinZoomLevel(19, 4);
-        LatLng point = new LatLng(39.963175, 116.400244);
-        MapStatus mapStatus = new MapStatus.Builder().zoom(7).target(point).build();
-        MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
-        mBaiduMap.setMapStatus(mMapStatusUpdate);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.app_toolbar);
-        Toolbar toolbarDevices = (Toolbar) findViewById(R.id.user_home_toolbar);
-        toolbarDevices.setTitle("我的设备");
+    //侧滑菜单
+    @BindView(R.id.drawer_layout)
+    DrawerLayout drawer ;
+    private void initDrawer() {
 
-        setSupportActionBar(toolbar);
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
@@ -235,7 +192,44 @@ public class MapActivity extends AppCompatActivity
 
             }
         });
-        location = (ImageButton) findViewById(R.id.ib_location);
+
+    }
+
+    @BindView(R.id.lv_device_list)
+    ListView listView;
+    private void initListView() {
+        listView.setAdapter(new ListViewAdapter(this, loginResponse));
+        MyOnItemOnClickListener listener = new MyOnItemOnClickListener();
+        listView.setOnItemClickListener(listener);
+        listView.setEmptyView(findViewById(R.id.tv_nomore));
+    }
+
+    //地图初始化
+    @BindView(R.id.bmapView)
+    MapView mapView ;
+    @BindView(R.id.ib_location)
+    ImageView location;
+    BitmapDescriptor bitmap;
+    private void initMap() {
+        mapView.showZoomControls(true);
+        mapView.showScaleControl(false);
+        mBaiduMap = mapView.getMap();
+        mBaiduMap.setMyLocationEnabled(true);
+        UiSettings mUiSettings = mBaiduMap.getUiSettings();
+        mUiSettings.setZoomGesturesEnabled(true);           //启用缩放手势
+        mUiSettings.setScrollGesturesEnabled(true);         //启用平移手势
+        mUiSettings.setRotateGesturesEnabled(false);        //关闭旋转手势
+        mUiSettings.setOverlookingGesturesEnabled(false);   //关闭俯视手势
+        mUiSettings.setCompassEnabled(false);               //关闭指南针图层
+        //普通地图
+        mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
+        mBaiduMap.setMaxAndMinZoomLevel(19, 3);
+        LatLng point = new LatLng(39.963175, 116.400244);
+        MapStatus mapStatus = new MapStatus.Builder().zoom(8).target(point).build();
+        MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);
+        mBaiduMap.setMapStatus(mMapStatusUpdate);
+        bitmap = BitmapDescriptorFactory
+                .fromResource(R.drawable.map_mark);
         location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -244,15 +238,23 @@ public class MapActivity extends AppCompatActivity
                 mBaiduMap.animateMapStatus(mMapStatusUpdate);
             }
         });
+
         //百度地图覆盖物点击事件
         mBaiduMap.setOnMarkerClickListener(this);
     }
 
-    //控件监听事件
-  /*  private void initListener() {
-        alarmBell.setOnClickListener(this);
-    }*/
+    //设置toolBar
+    @BindView(R.id.app_toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.user_home_toolbar)
+    Toolbar toolbarDevices;
+    private void initToolBar() {
+        toolbarDevices.setTitle("我的设备");
+        setSupportActionBar(toolbar);
+    }
 
+
+    //返回键功能
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -263,11 +265,6 @@ public class MapActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -280,9 +277,6 @@ public class MapActivity extends AppCompatActivity
     //最右侧，中浩科技，加载出我的设备
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         if (item.getItemId() == R.id.action_more){
         drawer.openDrawer(GravityCompat.END);}
         if(item.getItemId()==R.id.action_warning){
@@ -293,6 +287,7 @@ public class MapActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    //drawlayout中导航条的事件
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -317,6 +312,7 @@ public class MapActivity extends AppCompatActivity
             UpdateBiz updateBiz = new UpdateBiz();
             updateBiz.getNewVersion(handler, MapActivity.this);
 
+
         } else if (id == R.id.nav_business_server) {
             Intent intent = new Intent(this, BusinessServerActivity.class);
             startActivity(intent);
@@ -331,29 +327,15 @@ public class MapActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        //在activity执行onDestroy时执行mMapView.onDestroy()，实现地图生命周期管理
-        mapView.onDestroy();
-        mBaiduMap.setMyLocationEnabled(false);
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        //在activity执行onResume时执行mMapView. onResume ()，实现地图生命周期管理
-//        Toast.makeText(this, "onRescum", Toast.LENGTH_SHORT).show();
-        mapView.onResume();
-    }
-    long l ;
+    long time;
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
             //jingling.点击的时间差如果大于2000，则提示用户点击两次退出
-            if (System.currentTimeMillis() - l > 2000) {
+            if (System.currentTimeMillis() - time > 2000) {
                 // huoche.保存当前时间
-                l = System.currentTimeMillis();
+                time = System.currentTimeMillis();
                 //4.提示
                 Toast.makeText(MapActivity.this, "请再次点击退出程序", Toast.LENGTH_SHORT).show();
             } else {
@@ -365,15 +347,7 @@ public class MapActivity extends AppCompatActivity
         return true;
     }
 
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        //在activity执行onPause时执行mMapView.onPause ()，实现地图生命周期管理
-//        Toast.makeText(this, "onPause", Toast.LENGTH_SHORT).show();
-        mapView.onPause();
-    }
-
+    //百度地图覆盖物监听事件
     @Override
     public boolean onMarkerClick(Marker marker) {
         Bundle extraInfo = marker.getExtraInfo();
@@ -381,24 +355,25 @@ public class MapActivity extends AppCompatActivity
         int position = extraInfo.getInt("position");
         double latitude=extraInfo.getDouble("latitude");
         double longitude= extraInfo.getDouble("longitude");
-        Log.i("makerType",makerType+"");
         switch (makerType){
-            case 11://集装箱定位
+            case 0x11://集装箱定位
               LocationMsgShow.getLocationMsg(MapActivity.this,marker,mBaiduMap,position);
+
                 break;
-            /*default://路线定位信息
+            default://路线定位信息
               LocationMsgShow.getRouteMsg(MapActivity.this,position,marker,mBaiduMap,latitude,longitude);
-                break;*/
+                break;
         }
         return true;
     }
 
 
+    //listView的item事件
     private class MyOnItemOnClickListener implements AdapterView.OnItemClickListener {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//            Toast.makeText(MapActivity.this,"d=点击了"+loginResponse.getDevices().get(position),Toast.LENGTH_SHORT).show();
+            drawer.closeDrawer(GravityCompat.END);
             requestDevices = new RequestDevices();
             ArrayList<String> strings = new ArrayList<>();
             ArrayList<DevicesInfo> strings1 = new ArrayList<>();
@@ -407,18 +382,37 @@ public class MapActivity extends AppCompatActivity
             myposition = position;
             requestDevices.setUserinfo(strings);
             requestDevices.setDeviceID(strings1);
-            new Thread(new Runnable() {
+            /*new Thread(new Runnable() {
                 @Override
-                public void run() {
+                public void run() {*/
                     ServelBiz.getDvices(requestDevices, MapActivity.this, handler);
-                }
-            }).start();
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            drawer.closeDrawer(GravityCompat.END);
-            mapLogin.setVisibility(View.VISIBLE);
+           /*     }
+            }).start();*/
+
         }
     }
+
+
     @Override
-    public void onClick(View v) {
+    protected void onStart() {
+        super.onStart();
+
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mapView.onPause();
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mapView.onDestroy();
+        mBaiduMap.setMyLocationEnabled(false);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mapView.onResume();
     }
 }

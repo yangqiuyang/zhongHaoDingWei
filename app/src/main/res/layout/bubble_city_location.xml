@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.daasuu.bl.BubbleLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="256dp"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_marginTop="12dp"
-    android:paddingTop="16dp"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     app:bl_cornersRadius="10dip"
     app:bl_arrowHeight="10dp"
-    app:bl_arrowPosition="100dp"
+    app:bl_arrowPosition="120dp"
     app:bl_arrowWidth="16dp"
     app:bl_arrowDirection="bottom">
     <LinearLayout
         android:orientation="vertical"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center">
     <LinearLayout
@@ -33,7 +31,7 @@
             />
         <TextView
             android:id="@+id/longtitude"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="12sp"
             android:gravity="center"
@@ -54,7 +52,7 @@
             />
         <TextView
             android:id="@+id/latitude"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="12sp"
             android:gravity="center"
@@ -75,7 +73,7 @@
             />
         <TextView
             android:id="@+id/country"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="12sp"
             android:gravity="center"
@@ -96,7 +94,7 @@
             />
         <TextView
             android:id="@+id/province"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="12sp"
             android:gravity="center"
@@ -118,7 +116,7 @@
             />
         <TextView
             android:id="@+id/city"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="12sp"
             android:gravity="center"

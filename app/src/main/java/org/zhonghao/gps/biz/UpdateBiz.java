@@ -43,7 +43,6 @@ public class UpdateBiz {
 			public void onSuccess(File file) {
 				Log.i("升级003", file.getAbsolutePath());
 				Message message=handler.obtainMessage();
-//				message.what= MapActivity.MSG_INSTALL;
 				Bundle bundle=new Bundle();
 				bundle.putString("apkSavePath", apkSavePath);
 				message.setData(bundle);
@@ -137,14 +136,11 @@ public class UpdateBiz {
 			// 用什么框架联网步骤
 			// 1,连谁
 			// 新的apk刚开发出来，可能有bug,不能让所有用户都升级
-			//String url = "http://117.158.206.86:8681/NewGPSTrace2.0/update/update.txt";
 			String url = "http://gps.zhonghaokeji.cn/NewGPSTrace2.0/update/update.txt";
 			RequestParams requestParams = new RequestParams(url);
 			Log.i("resquenseP", requestParams.toString());
 
-
 			x.http().get(requestParams, new CommonCallback<String>() {
-
 				@Override
 				public void onSuccess(String result) {
 					Log.i("升级001", result);

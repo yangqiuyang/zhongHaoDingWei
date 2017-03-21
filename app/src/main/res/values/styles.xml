@@ -9,6 +9,7 @@
         <item name="windowNoTitle">true</item>
         <item name="android:gravity">center_horizontal</item>
         <item name="colorAccent">@color/colorAccent</item>
+
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -29,6 +30,10 @@
     <style name="pop_hide">
         <item name="android:windowExitAnimation">@anim/pop_hide</item>
     </style>
-
+    <style name="CustomDialog" parent="AppTheme">
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="colorAccent">#ffE91E63</item>
+    </style>
 
 </resources>

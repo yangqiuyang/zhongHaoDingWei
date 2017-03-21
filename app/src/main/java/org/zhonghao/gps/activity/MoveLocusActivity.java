@@ -23,6 +23,7 @@ import org.zhonghao.gps.application.MyApplication;
 import org.zhonghao.gps.biz.ServelBiz;
 import org.zhonghao.gps.entity.DevicesInfo;
 import org.zhonghao.gps.entity.RequestQueryDevicesMoveInfo;
+import org.zhonghao.gps.utils.ProgressUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -141,13 +142,14 @@ public class MoveLocusActivity extends AppCompatActivity {
                             myQueryRequest.setDeviceID(listDevices);
                             myQueryRequest.setStartTime(starttime);
                             myQueryRequest.setEndTime(endtime);
-                            new Thread(new Runnable() {
+                            ProgressUtils.showProgress(MoveLocusActivity.this);//加载轨迹数据进度条
+                         /*   new Thread(new Runnable() {
                                 @Override
-                                public void run() {
+                                public void run() {*/
                                     ServelBiz.getDvicesMoveLocus(myQueryRequest, MoveLocusActivity.this, handler);
-                                }
-                            }).start();
-                            handler.sendEmptyMessage(6);
+
+                         /*       }
+                            }).start();*/
                             finish();
 
 

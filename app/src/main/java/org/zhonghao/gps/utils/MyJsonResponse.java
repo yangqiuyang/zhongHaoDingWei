@@ -1,4 +1,4 @@
-package org.zhonghao.gps.netUtils;
+package org.zhonghao.gps.utils;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;

@@ -38,6 +38,7 @@ import org.zhonghao.gps.biz.ServelBiz;
 import org.zhonghao.gps.entity.DevicesInfo;
 import org.zhonghao.gps.entity.NameDates;
 import org.zhonghao.gps.entity.ResponseUserinfo;
+import org.zhonghao.gps.utils.ProgressUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +60,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     // UI references.
     private AutoCompleteTextView mUsername;
     private EditText mPasswordView;
-    private View mProgressView;
     private View mLoginFormView;
     public ResponseUserinfo responseUserinfo = null;
     private DevicesInfo.LoginResponse loginRsponse;
@@ -106,7 +106,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         });
 
         mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean isRemeber = pref.getBoolean("remember", false);//判断是否记录密码
         boolean isAuto = pref.getBoolean("automatic", false);//判断是否自动登录
@@ -175,7 +174,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            showProgress(true);
+            ProgressUtils.showProgress(this);
             editor = pref.edit();
             if (automatic.isChecked()) {
                 editor = pref.edit();
@@ -227,18 +226,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 }
             });
 
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
         } else {
             // The ViewPropertyAnimator APIs are not available, so simply show
             // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
@@ -304,7 +294,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
         UserLoginTask(String username, String password) {
-
             nameDates.setPassword(password);
             nameDates.setUsername(username);
             ArrayList list = new ArrayList<NameDates>();
@@ -335,10 +324,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
-            showProgress(false);
+            ProgressUtils.hideProgress();//隐藏进度条
 
             if (success) {
-
                 Intent intent = new Intent(LoginActivity.this, MapActivity.class);
                 intent.setClass(LoginActivity.this, MapActivity.class);
                 MyApplication.myDevice = loginRsponse.getDevices();

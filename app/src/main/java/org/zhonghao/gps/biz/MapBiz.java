@@ -45,6 +45,7 @@ import org.zhonghao.gps.entity.DevicesInfo;
 import org.zhonghao.gps.entity.MyLocation;
 import org.zhonghao.gps.entity.ResponseDevicesMove;
 import org.zhonghao.gps.utils.DecimalUtils;
+import org.zhonghao.gps.utils.ProgressUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,9 +65,6 @@ public class MapBiz {
         converter.coord(point1);
         LatLng point = converter.convert();
         MyApplication.point = point;
-      //  Log.d("serve", "进入了handler" + point.toString());
-      //   Log.d("serve", "进入了handler" + devicesInfo.getLatitude());
-
         //构建MarkerOption，用于在地图上添加Marker
         OverlayOptions option = new MarkerOptions()
                 .position(point)
@@ -157,7 +155,6 @@ public class MapBiz {
         mBaiduMap.addOverlay(Polyline);
         MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newLatLng(point.get(0));
         mBaiduMap.animateMapStatus(mMapStatusUpdate);
-
 
     }
 
