@@ -42,9 +42,11 @@ import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.UiSettings;
 import com.baidu.mapapi.model.LatLng;
+import com.jaeger.library.StatusBarUtil;
 
 import org.zhonghao.gps.R;
 import org.zhonghao.gps.adapter.ListViewAdapter;
+import org.zhonghao.gps.application.MyActivity;
 import org.zhonghao.gps.application.MyApplication;
 import org.zhonghao.gps.biz.MapBiz;
 import org.zhonghao.gps.biz.ServelBiz;
@@ -63,7 +65,7 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MapActivity extends AppCompatActivity
+public class MapActivity extends MyActivity
         implements NavigationView.OnNavigationItemSelectedListener,  BaiduMap.OnMarkerClickListener {
 
     BaiduMap mBaiduMap = null;
@@ -87,16 +89,15 @@ public class MapActivity extends AppCompatActivity
                         MapBiz.startMap(devicesInfos.get(0), mapView, mBaiduMap,MapActivity.this, bitmap,myposition);
                         break;
                     case 2:
-                        ProgressUtils.showProgress(MapActivity.this);
                         responseDevicesMove = (ResponseDevicesMove) bundle.get("response");
                           try {
                               MapBiz.moveLocusService(responseDevicesMove, mapView,  mBaiduMap, MapActivity.this,handler);
-                        } catch (Exception e) {
+                              ProgressUtils.hideProgress();
+                          } catch (Exception e) {
                             e.printStackTrace();
                             ProgressUtils.hideProgress();
 
                         }
-                        ProgressUtils.hideProgress();
                         break;
                     case 3:
                         Intent intent = new Intent(MapActivity.this, LoginActivity.class);
@@ -110,8 +111,8 @@ public class MapActivity extends AppCompatActivity
                         final UpdateInfo info = (UpdateInfo) bundle
                                 .getSerializable("versionEntity");
                         String serverApkVersion = info.getVersion();
-                        Log.i("update", serverApkVersion);
-                        Log.i("logcal", currntVersion);
+                       // Log.i("update", serverApkVersion);
+                       // Log.i("logcal", currntVersion);
                         if (Double.parseDouble(serverApkVersion) > Double.parseDouble(currntVersion)) {
                             AlertDialog.Builder dialog = new AlertDialog.Builder(MapActivity.this);
                             dialog.setMessage(info.getDescription());
@@ -134,6 +135,7 @@ public class MapActivity extends AppCompatActivity
                     case 5:
                         Toast.makeText(MapActivity.this,"网络状况不佳，休息一下再试吧",Toast.LENGTH_SHORT).show();
                         ProgressUtils.hideProgress();
+                        break;
                     case 7:
                         Toast.makeText(MapActivity.this,"该设备还没有信息哦",Toast.LENGTH_SHORT).show();
                         ProgressUtils.hideProgress();
@@ -141,9 +143,7 @@ public class MapActivity extends AppCompatActivity
                     case 0x11:
                         MapBiz.startMap(MyApplication.devicesInfo, mapView, mBaiduMap, MapActivity.this, bitmap,myposition);
                         drawer.closeDrawer(GravityCompat.END);
-                        ProgressUtils.hideProgress();
                         break;
-
                 }
 
             } catch (Exception e) {
@@ -155,18 +155,19 @@ public class MapActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+       supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_map);
         ButterKnife.bind(this);
         initToolBar();
+        initDrawer();
         initMap();
         initListView();
-        initDrawer();
         //jieshou登陆页面传入数据
         Intent intent = this.getIntent();
         loginResponse = (DevicesInfo.LoginResponse) intent.getSerializableExtra("loginResponse");
         myApplication = (MyApplication) this.getApplicationContext();
         myApplication.setMyHandler(handler);
+        MyApplication.context=MapActivity.this;
     }
 
     //侧滑菜单
@@ -198,9 +199,9 @@ public class MapActivity extends AppCompatActivity
     @BindView(R.id.lv_device_list)
     ListView listView;
     private void initListView() {
-        listView.setAdapter(new ListViewAdapter(this, loginResponse));
-        MyOnItemOnClickListener listener = new MyOnItemOnClickListener();
-        listView.setOnItemClickListener(listener);
+        listView.setAdapter(new ListViewAdapter(this, loginResponse,drawer));
+     //   MyOnItemOnClickListener listener = new MyOnItemOnClickListener();
+     //   listView.setOnItemClickListener(listener);
         listView.setEmptyView(findViewById(R.id.tv_nomore));
     }
 
@@ -238,7 +239,6 @@ public class MapActivity extends AppCompatActivity
                 mBaiduMap.animateMapStatus(mMapStatusUpdate);
             }
         });
-
         //百度地图覆盖物点击事件
         mBaiduMap.setOnMarkerClickListener(this);
     }
@@ -323,7 +323,6 @@ public class MapActivity extends AppCompatActivity
 
         }
         drawer.closeDrawer(GravityCompat.START);
-
         return true;
     }
 
@@ -357,40 +356,39 @@ public class MapActivity extends AppCompatActivity
         double longitude= extraInfo.getDouble("longitude");
         switch (makerType){
             case 0x11://集装箱定位
-              LocationMsgShow.getLocationMsg(MapActivity.this,marker,mBaiduMap,position);
-
+                LocationMsgShow.getLocationMsg(MapActivity.this,marker,mBaiduMap,position);
+                ProgressUtils.hideProgress();
                 break;
             default://路线定位信息
-              LocationMsgShow.getRouteMsg(MapActivity.this,position,marker,mBaiduMap,latitude,longitude);
+              LocationMsgShow.getRouteMsg(MapActivity.this,marker,mBaiduMap,latitude,longitude);
                 break;
         }
         return true;
     }
 
-
-    //listView的item事件
+/*//listView的item事件
     private class MyOnItemOnClickListener implements AdapterView.OnItemClickListener {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             drawer.closeDrawer(GravityCompat.END);
-            requestDevices = new RequestDevices();
+         *//*   requestDevices = new RequestDevices();
             ArrayList<String> strings = new ArrayList<>();
             ArrayList<DevicesInfo> strings1 = new ArrayList<>();
             strings.add(MyApplication.nameDates.getUsername());
             strings1.add(loginResponse.getDevices().get(position));
             myposition = position;
             requestDevices.setUserinfo(strings);
-            requestDevices.setDeviceID(strings1);
-            /*new Thread(new Runnable() {
+            requestDevices.setDeviceID(strings1);*//*
+          *//*  *//**//**//**//*new Thread(new Runnable() {
                 @Override
-                public void run() {*/
+                public void run() {*//**//**//**//*
                     ServelBiz.getDvices(requestDevices, MapActivity.this, handler);
-           /*     }
-            }).start();*/
+           *//**//**//**//*     }
+            }).start();*//**//**//**//**//*
 
         }
-    }
+    }*/
 
 
     @Override

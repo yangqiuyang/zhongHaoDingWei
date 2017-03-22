@@ -102,4 +102,19 @@ public class ResponseDevicesMove implements Serializable {
         return routeTypes;
     }
 
+    @Override
+    public String toString() {
+        return "ResponseDevicesMove{" +
+                "myCentersLat='" + myCentersLat + '\'' +
+                ", containerTypes='" + containerTypes + '\'' +
+                ", trainIds='" + trainIds + '\'' +
+                ", location=" + location +
+                ", endAddresssLon='" + endAddresssLon + '\'' +
+                ", ids='" + ids + '\'' +
+                ", endAddresssLat='" + endAddresssLat + '\'' +
+                ", containerIds='" + containerIds + '\'' +
+                ", myCentersLon='" + myCentersLon + '\'' +
+                ", routeTypes='" + routeTypes + '\'' +
+                '}';
+    }
 }

@@ -29,6 +29,7 @@ import com.android.volley.toolbox.Volley;
 
 import org.json.JSONObject;
 import org.zhonghao.gps.R;
+import org.zhonghao.gps.application.MyActivity;
 import org.zhonghao.gps.customView.ToggleText;
 import org.zhonghao.gps.utils.Urls;
 import org.zhonghao.gps.utils.WarnIPopupWindow;
@@ -38,7 +39,7 @@ import java.util.HashMap;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class WarnInformationActivity extends AppCompatActivity {
+public class WarnInformationActivity extends MyActivity {
 
     @BindView(R.id.toolbar_warn_information)
     Toolbar toolBar;

@@ -6,4 +6,5 @@
     <color name="white">#ffffff</color>
     <color name="colorButtonPress">#FF065E8D</color>
     <color name="colorButtonUnPress">#89b4d7</color>
+    <color name="status_bar">#2A7DC3</color>
 </resources>

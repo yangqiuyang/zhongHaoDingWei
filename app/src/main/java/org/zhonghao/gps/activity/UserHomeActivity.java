@@ -9,44 +9,46 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.jaeger.library.StatusBarUtil;
+
 import org.zhonghao.gps.R;
+import org.zhonghao.gps.application.MyActivity;
 import org.zhonghao.gps.application.MyApplication;
 
-public class UserHomeActivity extends AppCompatActivity {
+public class UserHomeActivity extends MyActivity {
     TextView userName, email, company, telephone;
-    ImageView imageView;
-    Button button;
+    TextView login;
     Handler handler;
     MyApplication myApplication;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_user_home);
         setView();
         myApplication = (MyApplication) this.getApplicationContext();
         handler = myApplication.getMyHandler();
         Toolbar toolbar = (Toolbar) findViewById(R.id.user_home_toolbar);
-//        toolbar.addView(View.inflate(MapActivity.this,R.layout.list_layout,null),0);
         toolbar.setTitle("个人中心");
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
-        setSupportActionBar(toolbar);
-        button.setOnClickListener(new View.OnClickListener() {
+        login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
                 SharedPreferences pref;
                 SharedPreferences.Editor editor;
                 pref = PreferenceManager.getDefaultSharedPreferences(UserHomeActivity.this);
-               editor = pref.edit();
+                editor = pref.edit();
                 editor.putBoolean("automatic", false);
                 editor.commit();
                 handler.sendEmptyMessage(3);
+                finish();
 
             }
         });
@@ -57,7 +59,7 @@ public class UserHomeActivity extends AppCompatActivity {
         email = (TextView) findViewById(R.id.tv_userhome_email);
         company = (TextView) findViewById(R.id.tv_userhome_company);
         telephone = (TextView) findViewById(R.id.tv_userhome_phonenum);
-        button  = (Button) findViewById(R.id.btn_backLogin);
+        login  = (TextView) findViewById(R.id.btn_backLogin);
         userName.setText(MyApplication.myUserInnfo.getUserName());
         email.setText(MyApplication.myUserInnfo.getEmail());
         company.setText(MyApplication.myUserInnfo.getCompany());

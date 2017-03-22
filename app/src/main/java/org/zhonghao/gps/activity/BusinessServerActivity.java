@@ -5,21 +5,27 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.Window;
 
 import org.zhonghao.gps.R;
+import org.zhonghao.gps.application.MyActivity;
 
-public class BusinessServerActivity extends AppCompatActivity {
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
+public class BusinessServerActivity extends MyActivity {
+
+    @BindView(R.id.user_home_toolbar)
+    Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_business_server);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.user_home_toolbar);
-//        toolbar.addView(View.inflate(MapActivity.this,R.layout.list_layout,null),0);
+        ButterKnife.bind(this);
         toolbar.setTitle("关于我们");
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
-        setSupportActionBar(toolbar);
     }
     float x1 = 0;
     float x2 = 0;

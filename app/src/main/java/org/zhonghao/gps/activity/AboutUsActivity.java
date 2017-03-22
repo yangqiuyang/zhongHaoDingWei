@@ -6,22 +6,24 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.Window;
 import android.widget.TextView;
 
 import org.zhonghao.gps.R;
+import org.zhonghao.gps.application.MyActivity;
 
-public class AboutUsActivity extends AppCompatActivity {
+public class AboutUsActivity extends MyActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_about_us);
         Toolbar toolbar = (Toolbar) findViewById(R.id.about_us_toolbar);
 //        toolbar.addView(View.inflate(MapActivity.this,R.layout.list_layout,null),0);
         toolbar.setTitle("关于");
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
-        setSupportActionBar(toolbar);
         TextView version = (TextView) findViewById(R.id.tv_version);
         try {
             version.setText(org.zhonghao.gps.biz.Tools.getCurrentVersion(AboutUsActivity.this));

@@ -1,6 +1,7 @@
 package org.zhonghao.gps.application;
 
 import android.app.Application;
+import android.content.Context;
 import android.os.Handler;
 
 import com.android.volley.RequestQueue;
@@ -16,12 +17,14 @@ import org.zhonghao.gps.entity.DevicesLocationMsg;
 import org.zhonghao.gps.entity.DevicesSelfLocation;
 import org.zhonghao.gps.entity.NameDates;
 import org.zhonghao.gps.entity.UserInfo;
+import org.zhonghao.gps.utils.ProgressUtils;
 
 /**
  * Created by lenovo on 2016/11/28.
  */
 
 public class MyApplication extends Application {
+    public static Context context;
     public static NameDates nameDates = new NameDates();
     public static Boolean responseState = false;
     public static UserInfo myUserInnfo = new UserInfo();

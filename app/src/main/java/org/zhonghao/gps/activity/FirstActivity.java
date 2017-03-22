@@ -9,9 +9,10 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 
 import org.zhonghao.gps.R;
+import org.zhonghao.gps.application.MyActivity;
 import org.zhonghao.gps.biz.Tools;
 
-public class FirstActivity extends AppCompatActivity {
+public class FirstActivity extends MyActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

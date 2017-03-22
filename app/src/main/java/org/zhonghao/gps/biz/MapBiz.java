@@ -92,7 +92,8 @@ public class MapBiz {
         ArrayList<MyLocation> devicesLocation = responseDevicesMove.getLocation();
         final List<LatLng> point = new ArrayList<LatLng>();
         if(devicesLocation.size() < 1){
-            handler.sendEmptyMessage(7);
+            handler.sendEmptyMessage(5);//数据没有请求到
+            return;
         }
         for (int i = 0; i < devicesLocation.size() - 1; i++) {
 

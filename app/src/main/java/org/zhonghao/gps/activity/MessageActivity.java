@@ -5,8 +5,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import org.zhonghao.gps.R;
+import org.zhonghao.gps.application.MyActivity;
 
-public class MessageActivity extends AppCompatActivity {
+public class MessageActivity extends MyActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

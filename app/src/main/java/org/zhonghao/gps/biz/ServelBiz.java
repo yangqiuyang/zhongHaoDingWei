@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.zhonghao.gps.activity.MapActivity;
 import org.zhonghao.gps.activity.MoveLocusActivity;
 import org.zhonghao.gps.application.MyApplication;
 import org.zhonghao.gps.entity.DevicesInfo;
@@ -185,6 +186,7 @@ public class ServelBiz {
                 bundle.putSerializable("list",list);
                 msg.setData(bundle);
                 handler.sendMessage(msg);
+                ProgressUtils.hideProgress();
             }
         }, new Response.ErrorListener() {
             @Override
@@ -194,7 +196,7 @@ public class ServelBiz {
         },jsonDate);
         queue.add(res);
     }
-    public static void getDvicesMoveLocus(RequestQueryDevicesMoveInfo requestDevicesMove, Context context, final Handler handler) {
+    public static void getDvicesMoveLocus(RequestQueryDevicesMoveInfo requestDevicesMove, final Context context, final Handler handler) {
         /*URL url;
         HttpURLConnection connection;
         Gson gson = new Gson();
@@ -244,12 +246,12 @@ public class ServelBiz {
         }
         return null;*/
         final Gson gson = new Gson();
-        final ArrayList<ResponseDevicesMove> list = new ArrayList<>();
         RequestQueue queue= Volley.newRequestQueue(context);
         String jsonDate = gson.toJson(requestDevicesMove);
         MyJsonResponse res=new MyJsonResponse(Urls.DEVICE_ROUTE, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
+                ArrayList<ResponseDevicesMove> list = new ArrayList<>();
                 for (int i = 0; i < response.length(); i++) {
                     try {
                         JSONObject obj = response.getJSONObject(i);
@@ -259,11 +261,13 @@ public class ServelBiz {
                     }
                 }
                 //  Log.d("serve", "loginBiz:得到的jason" + response);
+
                 if (list.get(0) != null) {
                     Message msg = handler.obtainMessage();
                     msg.what = 2;
                     Bundle bundle = new Bundle();
                     bundle.putSerializable("response", list.get(0));
+                    Log.i("response",list.get(0).toString());
                     msg.setData(bundle);
                     handler.sendMessage(msg);
                 }
@@ -292,7 +296,7 @@ public class ServelBiz {
         devices.setUserinfo(userinfo);
         String json = new Gson().toJson(devices);
         RequestQueue queue= Volley.newRequestQueue(context);
-        ProgressUtils.showProgress(context);
+        ProgressUtils.showProgress(MyApplication.context);//加载轨迹数据进度条
         MyJsonResponse res=new MyJsonResponse(Urls.BASE_URL + Urls.SELF_DEVICE_LOCATION, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -306,6 +310,7 @@ public class ServelBiz {
                 }
                 MyApplication.devicesInfo=deMsg.get(0);
                 handler.sendEmptyMessage(0x11);
+        ProgressUtils.hideProgress();
             }
         }, new Response.ErrorListener() {
             @Override

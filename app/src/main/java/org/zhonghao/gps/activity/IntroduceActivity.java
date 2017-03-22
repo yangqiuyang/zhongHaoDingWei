@@ -11,11 +11,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import org.zhonghao.gps.R;
+import org.zhonghao.gps.application.MyActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class IntroduceActivity extends AppCompatActivity {
+public class IntroduceActivity extends MyActivity {
     private View view1,view2;
     ViewPager viewPager;
     private List<View> viewList;

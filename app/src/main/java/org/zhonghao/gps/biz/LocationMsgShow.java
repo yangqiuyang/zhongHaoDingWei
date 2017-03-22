@@ -105,7 +105,6 @@ public class LocationMsgShow {
 
             @Override
             public void onGetReverseGeoCodeResult(ReverseGeoCodeResult result) {
-                ProgressUtils.hideProgress();
                 if(result==null||result.error!= SearchResult.ERRORNO.NO_ERROR){
                     Toast.makeText(context, "抱歉，未能找到地址信息", Toast.LENGTH_LONG)
                             .show();
@@ -120,7 +119,7 @@ public class LocationMsgShow {
         });
     }
 
-    public static void getRouteMsg(final Context context, int position, final Marker marker, final BaiduMap mBaiduMap, final double latitude, double longitude) {
+    public static void getRouteMsg(final Context context,  final Marker marker, final BaiduMap mBaiduMap, final double latitude, double longitude) {
         final LayoutInflater inflater=LayoutInflater.from(context);
         final LatLng latLng=new LatLng(latitude,longitude);
         //poi
@@ -140,7 +139,6 @@ public class LocationMsgShow {
 
             @Override
             public void onGetReverseGeoCodeResult(ReverseGeoCodeResult result) {
-                ProgressUtils.hideProgress();
                 if(result==null||result.error!= SearchResult.ERRORNO.NO_ERROR){
                     Toast.makeText(context, "抱歉，未能找到地址信息", Toast.LENGTH_LONG)
                             .show();
@@ -155,7 +153,6 @@ public class LocationMsgShow {
                         latitudeTxt.setText(DecimalUtils.getDouble(latLng.latitude));
                         longtitudeTxt.setText(DecimalUtils.getDouble(latLng.longitude));
                         mBaiduMap.showInfoWindow(mInfoWindow);
-                        ProgressUtils.hideProgress();
                         mBaiduMap.setOnMapClickListener(new BaiduMap.OnMapClickListener() {
                             @Override
                             public void onMapClick(LatLng latLng) {

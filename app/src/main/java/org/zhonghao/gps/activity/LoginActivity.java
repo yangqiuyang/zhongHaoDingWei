@@ -33,6 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.zhonghao.gps.R;
+import org.zhonghao.gps.application.MyActivity;
 import org.zhonghao.gps.application.MyApplication;
 import org.zhonghao.gps.biz.ServelBiz;
 import org.zhonghao.gps.entity.DevicesInfo;
@@ -48,7 +49,7 @@ import static org.zhonghao.gps.application.MyApplication.nameDates;
 /**
  * A login screen that offers login via user_name/password.
  */
-public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
+public class LoginActivity extends MyActivity implements LoaderCallbacks<Cursor> {
 
 
 
