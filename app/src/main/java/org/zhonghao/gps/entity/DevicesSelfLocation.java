@@ -1,12 +1,13 @@
 package org.zhonghao.gps.entity;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by Administrator on 2017/huoche/17.
  */
-
-public class DevicesSelfLocation {
+//上传服务器，请求数据定位信息的格式
+public class DevicesSelfLocation implements Serializable{
     private List<String> userinfo;
     private List<String> DeviceID;
 

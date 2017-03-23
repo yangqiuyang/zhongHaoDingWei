@@ -16,7 +16,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -36,7 +35,7 @@ import org.zhonghao.gps.R;
 import org.zhonghao.gps.application.MyActivity;
 import org.zhonghao.gps.application.MyApplication;
 import org.zhonghao.gps.biz.ServelBiz;
-import org.zhonghao.gps.entity.DevicesInfo;
+import org.zhonghao.gps.entity.LoginResponse;
 import org.zhonghao.gps.entity.NameDates;
 import org.zhonghao.gps.entity.ResponseUserinfo;
 import org.zhonghao.gps.utils.ProgressUtils;
@@ -63,7 +62,6 @@ public class LoginActivity extends MyActivity implements LoaderCallbacks<Cursor>
     private EditText mPasswordView;
     private View mLoginFormView;
     public ResponseUserinfo responseUserinfo = null;
-    private DevicesInfo.LoginResponse loginRsponse;
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
     private CheckBox rememberPass, automatic;
@@ -292,14 +290,15 @@ public class LoginActivity extends MyActivity implements LoaderCallbacks<Cursor>
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
+    LoginResponse loginResponse;//登录请求的数据
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
         UserLoginTask(String username, String password) {
-            nameDates.setPassword(password);
-            nameDates.setUsername(username);
+            nameDates.setPassword(password);//密码
+            nameDates.setUsername(username);//姓名
             ArrayList list = new ArrayList<NameDates>();
             list.add(nameDates);
-            responseUserinfo = new ResponseUserinfo();
+            responseUserinfo = new ResponseUserinfo();//上传数据
             responseUserinfo.setUserinfo(list);
         }
 
@@ -309,10 +308,9 @@ public class LoginActivity extends MyActivity implements LoaderCallbacks<Cursor>
 
             try {
                 // Simulate network access.
-                loginRsponse = ServelBiz.LoginBiz(responseUserinfo, LoginActivity.this);
-//                ServelBiz.getDvices();
-                Thread.sleep(2000);
-                return loginRsponse.getState();
+                 loginResponse = ServelBiz.LoginBiz(responseUserinfo, LoginActivity.this);
+                 Thread.sleep(2000);
+                 return loginResponse.getState();
 
             } catch (Exception e) {
                 return false;
@@ -322,19 +320,14 @@ public class LoginActivity extends MyActivity implements LoaderCallbacks<Cursor>
             // TODO: register the new account here.
         }
 
+        //获取设备信息,登录成功后，页面跳转
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
             ProgressUtils.hideProgress();//隐藏进度条
-
             if (success) {
                 Intent intent = new Intent(LoginActivity.this, MapActivity.class);
                 intent.setClass(LoginActivity.this, MapActivity.class);
-                MyApplication.myDevice = loginRsponse.getDevices();
-                Bundle bundlle = new Bundle();
-                bundlle.putSerializable("loginResponse", loginRsponse);
-                bundlle.putSerializable("userName", nameDates);
-                intent.putExtras(bundlle);
                 startActivity(intent);
                 finish();
             } else {

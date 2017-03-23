@@ -6,8 +6,8 @@ import java.util.ArrayList;
 /**
  * Created by lenovo on 2016/12/5.
  */
-
-public class DevicesInfo implements Serializable{
+//定位数据上传服务器，返回的定位信息
+public class DevicesLocateInfo implements Serializable{
     private String containerType;
     private String routeType;
     private String deviceID;
@@ -120,41 +120,5 @@ public class DevicesInfo implements Serializable{
      * Created by lenovo on 2016/11/24.
      */
 
-    public static class LoginResponse implements Serializable {
-        private String message;
-        private Boolean state;
-        private UserInfo userinfo;
-        private ArrayList<DevicesInfo> devices;
-        public void setState(Boolean state) {
-            this.state = state;
-        }
 
-        public Boolean getState() {
-            return state;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
-
-        public ArrayList<DevicesInfo> getDevices() {
-            return devices;
-        }
-
-        public void setDevices(ArrayList<DevicesInfo> devices) {
-            this.devices = devices;
-        }
-
-        public UserInfo getUserinfo() {
-            return userinfo;
-        }
-
-        public void setUserinfo(UserInfo userinfo) {
-            this.userinfo = userinfo;
-        }
-    }
 }

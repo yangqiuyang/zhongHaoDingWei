@@ -7,7 +7,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -22,7 +21,8 @@ import android.widget.Toast;
 import org.zhonghao.gps.R;
 import org.zhonghao.gps.application.MyApplication;
 import org.zhonghao.gps.biz.ServelBiz;
-import org.zhonghao.gps.entity.DevicesInfo;
+import org.zhonghao.gps.entity.DevicesLocateInfo;
+import org.zhonghao.gps.entity.LoginResponseDevice;
 import org.zhonghao.gps.entity.RequestQueryDevicesMoveInfo;
 
 import java.text.ParseException;
@@ -34,8 +34,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-import static android.R.attr.data;
 
 public class MoveLocusActivity extends AppCompatActivity {
     private ArrayList<String> listDevices;
@@ -57,7 +55,6 @@ public class MoveLocusActivity extends AppCompatActivity {
     private AlertDialog dialog;
     private TextView confirm, cancel, query;
     private static final String[] name = {"最近一天", "最近一周", "最近一月", "自定义"};
-    private ArrayList<DevicesInfo> device;
     private int myposition;
     private RequestQueryDevicesMoveInfo myQueryRequest = new RequestQueryDevicesMoveInfo();
     MyApplication myApplication;
@@ -91,16 +88,19 @@ public class MoveLocusActivity extends AppCompatActivity {
         cancel = (TextView) selector.findViewById(R.id.btn_dialog_cancel);
         datePicker = (DatePicker) selector.findViewById(R.id.date_picker);
     }
-     List<String> devices;
+    ArrayList<LoginResponseDevice> device;
+    List<String>devices;
     private void initData() {
         Intent intent = this.getIntent();
+        //获取是从第几个deviceid跳转过来的，默认显示第一个
         myposition = intent.getIntExtra("position",0);
         myApplication = (MyApplication) this.getApplicationContext();
         handler = myApplication.getMyHandler();
         devices=new ArrayList<>();
-        device = MyApplication.myDevice;
-        for (int i = 0; i < MyApplication.myDevice.size(); i++) {
-            devices.add(MyApplication.myDevice.get(i).getDeviceID());
+        //获取设备信息
+        device= MyApplication.loginResponse.getDevices();
+        for (int i = 0; i <device.size(); i++) {
+           devices.add(device.get(i).getDeviceID());
         }
         //设置默认设备号
         queryDeviceNum = device.get(0).getDeviceID();
@@ -115,6 +115,7 @@ public class MoveLocusActivity extends AppCompatActivity {
         devicesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, devices);
         devicesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         num.setAdapter(devicesAdapter);
+        //设置默认的deviceid，如果是从设备定位跳转过来，则设置deviceid的位置，否则默认第一个
         num.setSelection(myposition);
     }
 
@@ -144,6 +145,8 @@ public class MoveLocusActivity extends AppCompatActivity {
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
     }
 
+    //设置的设备地址
+    private int devicePosition;
     private void initListener() {
         //日期选择
         date.setOnItemSelectedListener(new MyItemClickListener());
@@ -152,6 +155,7 @@ public class MoveLocusActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 queryDeviceNum = device.get(position).getDeviceID();
+                devicePosition=position;
             }
 
             @Override
@@ -219,20 +223,14 @@ public class MoveLocusActivity extends AppCompatActivity {
                 // 检查时间是否正确
                 if (startDate.before(endDate)) {
                     listDevices = new ArrayList<String>();
-                    listDevices.add(queryDeviceNum);
+                    listDevices.add(queryDeviceNum);//deviceid请求格式是jsonArray形式的
                     myQueryRequest.setUserinfo(MyApplication.nameDates.getUsername());
                     myQueryRequest.setDeviceID(listDevices);
                     myQueryRequest.setStartTime(starttime);
                     myQueryRequest.setEndTime(endtime);
-                    Log.i("endtime",endtime);
-                    Log.i("endtime",starttime);
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            ServelBiz.getDvicesMoveLocus(myQueryRequest, MoveLocusActivity.this, handler);
-                        }
-                    }).start();
-                    handler.sendEmptyMessage(6);
+                    MyApplication.DevicesMoveInfo=myQueryRequest;
+                    //跳转时携带第几个设备信息号id，一会要显示设备信息
+                    ServelBiz.getDvicesMoveLocus(myQueryRequest, MoveLocusActivity.this, handler,devicePosition);
                     finish();
 
 

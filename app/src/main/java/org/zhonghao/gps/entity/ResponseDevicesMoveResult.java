@@ -7,10 +7,8 @@ import java.util.ArrayList;
 /**
  * Created by lenovo on 2016/12/13.
  */
-
-public class ResponseDevicesMove implements Serializable {
-
-
+//device移动路线
+public class ResponseDevicesMoveResult implements Serializable {
     private String myCentersLat;
     private String containerTypes;
     private String trainIds;
@@ -104,7 +102,7 @@ public class ResponseDevicesMove implements Serializable {
 
     @Override
     public String toString() {
-        return "ResponseDevicesMove{" +
+        return "ResponseDevicesMoveResult{" +
                 "myCentersLat='" + myCentersLat + '\'' +
                 ", containerTypes='" + containerTypes + '\'' +
                 ", trainIds='" + trainIds + '\'' +

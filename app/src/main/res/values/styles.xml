@@ -42,5 +42,11 @@
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="colorAccent">#ffE91E63</item>
     </style>
-
+    <style name="loading_dialog" parent="android:style/Theme.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
 </resources>

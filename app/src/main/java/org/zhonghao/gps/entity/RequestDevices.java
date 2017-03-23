@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class RequestDevices implements Serializable {
     private ArrayList<String> userinfo;
-    private ArrayList<DevicesInfo> DeviceID;
+    private ArrayList<DevicesLocateInfo> DeviceID;
 
     public ArrayList<String> getUserinfo() {
         return userinfo;
@@ -19,11 +19,11 @@ public class RequestDevices implements Serializable {
         this.userinfo = userinfo;
     }
 
-    public ArrayList<DevicesInfo> getDeviceID() {
+    public ArrayList<DevicesLocateInfo> getDeviceID() {
         return DeviceID;
     }
 
-    public void setDeviceID(ArrayList<DevicesInfo> deviceID) {
+    public void setDeviceID(ArrayList<DevicesLocateInfo> deviceID) {
         DeviceID = deviceID;
     }
 }

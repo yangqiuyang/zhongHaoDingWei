@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.TextView;
 
 import org.zhonghao.gps.R;
 
@@ -17,7 +18,7 @@ public class MyDialog extends Dialog implements View.OnClickListener{
     public static String  myTime;
     private Context context;
     private LeaveMyDialogListener listener;
-    private Button confirm,cancel;
+    private TextView confirm,cancel;
     private DatePicker datePicker;
 
 
@@ -48,8 +49,8 @@ public class MyDialog extends Dialog implements View.OnClickListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.date_selector_layout);
-        confirm = (Button) findViewById(R.id.btn_dialog_cancel);
-        cancel = (Button) findViewById(R.id.btn_dialog_confirm);
+        confirm = (TextView) findViewById(R.id.btn_dialog_cancel);
+        cancel = (TextView) findViewById(R.id.btn_dialog_confirm);
         datePicker = (DatePicker) findViewById(R.id.date_picker);
 
         confirm.setOnClickListener(this);

@@ -3,17 +3,15 @@ package org.zhonghao.gps.activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -21,17 +19,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.baidu.location.LocationClient;
-import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
@@ -42,25 +33,22 @@ import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.UiSettings;
 import com.baidu.mapapi.model.LatLng;
-import com.jaeger.library.StatusBarUtil;
 
 import org.zhonghao.gps.R;
-import org.zhonghao.gps.adapter.ListViewAdapter;
+import org.zhonghao.gps.adapter.RecyclerDeviceAdapter;
 import org.zhonghao.gps.application.MyActivity;
 import org.zhonghao.gps.application.MyApplication;
 import org.zhonghao.gps.biz.MapBiz;
-import org.zhonghao.gps.biz.ServelBiz;
 import org.zhonghao.gps.biz.Tools;
 import org.zhonghao.gps.biz.UpdateBiz;
-import org.zhonghao.gps.entity.DevicesInfo;
+import org.zhonghao.gps.entity.DevicesLocateInfo;
 import org.zhonghao.gps.entity.RequestDevices;
-import org.zhonghao.gps.entity.ResponseDevicesMove;
+import org.zhonghao.gps.entity.ResponseDevicesMoveResult;
 import org.zhonghao.gps.entity.UpdateInfo;
 import org.zhonghao.gps.biz.LocationMsgShow;
 import org.zhonghao.gps.utils.ProgressUtils;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -69,13 +57,9 @@ public class MapActivity extends MyActivity
         implements NavigationView.OnNavigationItemSelectedListener,  BaiduMap.OnMarkerClickListener {
 
     BaiduMap mBaiduMap = null;
-    DevicesInfo.LoginResponse loginResponse = null;
     TextView username;
-    RequestDevices requestDevices = null;
-    ArrayList<DevicesInfo> devicesInfos = null;
-    ResponseDevicesMove responseDevicesMove = null;
+    ResponseDevicesMoveResult responseDevicesMove = null;
     MyApplication myApplication;
-    int myposition = 0;
     Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -84,19 +68,14 @@ public class MapActivity extends MyActivity
                 int msgId = msg.what;
                 Bundle bundle = msg.getData();
                 switch (msgId) {
-                    case 1:
-                        devicesInfos = (ArrayList<DevicesInfo>) bundle.get("list");
-                        MapBiz.startMap(devicesInfos.get(0), mapView, mBaiduMap,MapActivity.this, bitmap,myposition);
-                        break;
                     case 2:
-                        responseDevicesMove = (ResponseDevicesMove) bundle.get("response");
+                        responseDevicesMove = (ResponseDevicesMoveResult) bundle.get("response");
+                        int  position = (int) bundle.get("position");
                           try {
-                              MapBiz.moveLocusService(responseDevicesMove, mapView,  mBaiduMap, MapActivity.this,handler);
-                              ProgressUtils.hideProgress();
+                              MapBiz.moveLocusService(responseDevicesMove, mapView,  mBaiduMap, MapActivity.this,handler,position);
                           } catch (Exception e) {
                             e.printStackTrace();
                             ProgressUtils.hideProgress();
-
                         }
                         break;
                     case 3:
@@ -111,8 +90,6 @@ public class MapActivity extends MyActivity
                         final UpdateInfo info = (UpdateInfo) bundle
                                 .getSerializable("versionEntity");
                         String serverApkVersion = info.getVersion();
-                       // Log.i("update", serverApkVersion);
-                       // Log.i("logcal", currntVersion);
                         if (Double.parseDouble(serverApkVersion) > Double.parseDouble(currntVersion)) {
                             AlertDialog.Builder dialog = new AlertDialog.Builder(MapActivity.this);
                             dialog.setMessage(info.getDescription());
@@ -133,7 +110,7 @@ public class MapActivity extends MyActivity
                         }
                         break;
                     case 5:
-                        Toast.makeText(MapActivity.this,"网络状况不佳，休息一下再试吧",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MapActivity.this,"数据请求失败，请稍后再试",Toast.LENGTH_SHORT).show();
                         ProgressUtils.hideProgress();
                         break;
                     case 7:
@@ -141,21 +118,23 @@ public class MapActivity extends MyActivity
                         ProgressUtils.hideProgress();
                         break;
                     case 0x11:
-                        MapBiz.startMap(MyApplication.devicesInfo, mapView, mBaiduMap, MapActivity.this, bitmap,myposition);
+                        int myPosition=msg.arg1;//请求的是第几个deviceid的
+                        DevicesLocateInfo deviceInfo = (DevicesLocateInfo) msg.obj;
+                        MapBiz.startMap(mapView, mBaiduMap, MapActivity.this, bitmap,myPosition,deviceInfo);
                         drawer.closeDrawer(GravityCompat.END);
                         break;
                 }
 
             } catch (Exception e) {
                 Toast.makeText(MapActivity.this,"出错了，稍后再试吧",Toast.LENGTH_SHORT).show();
-
+                ProgressUtils.hideProgress();
             }
         }
     };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_map);
         ButterKnife.bind(this);
         initToolBar();
@@ -163,13 +142,10 @@ public class MapActivity extends MyActivity
         initMap();
         initListView();
         //jieshou登陆页面传入数据
-        Intent intent = this.getIntent();
-        loginResponse = (DevicesInfo.LoginResponse) intent.getSerializableExtra("loginResponse");
         myApplication = (MyApplication) this.getApplicationContext();
         myApplication.setMyHandler(handler);
         MyApplication.context=MapActivity.this;
     }
-
     //侧滑菜单
     @BindView(R.id.drawer_layout)
     DrawerLayout drawer ;
@@ -197,12 +173,15 @@ public class MapActivity extends MyActivity
     }
 
     @BindView(R.id.lv_device_list)
-    ListView listView;
+    RecyclerView recycler;
+    RecyclerDeviceAdapter adapter;
     private void initListView() {
-        listView.setAdapter(new ListViewAdapter(this, loginResponse,drawer));
-     //   MyOnItemOnClickListener listener = new MyOnItemOnClickListener();
-     //   listView.setOnItemClickListener(listener);
-        listView.setEmptyView(findViewById(R.id.tv_nomore));
+        LinearLayoutManager manager=new LinearLayoutManager(this);
+        recycler.setLayoutManager(manager);
+        adapter=new RecyclerDeviceAdapter(this);
+        recycler.setAdapter(adapter);
+        adapter.addData(MyApplication.loginResponse);
+
     }
 
     //地图初始化
@@ -300,7 +279,7 @@ public class MapActivity extends MyActivity
 
         } else if (id == R.id.nav_move_locus) {
             Intent intent = new Intent(this, MoveLocusActivity.class);
-            intent.putExtra("position",0);
+            intent.putExtra("position",0);//轨迹查询默认第一
             startActivity(intent);
 
         } else if (id == R.id.nav_user_home) {
@@ -351,45 +330,18 @@ public class MapActivity extends MyActivity
     public boolean onMarkerClick(Marker marker) {
         Bundle extraInfo = marker.getExtraInfo();
         int makerType = extraInfo.getInt("markerType");
-        int position = extraInfo.getInt("position");
-        double latitude=extraInfo.getDouble("latitude");
-        double longitude= extraInfo.getDouble("longitude");
+        int markerPostion = extraInfo.getInt("position");//包含定位时是点击的list跳转的路线定位的位置,另一个是路线规划时的点击的Marker位置
+        int devicePosition= extraInfo.getInt("devicePosition");//获取设备信息的设备devicedid
         switch (makerType){
-            case 0x11://集装箱定位
-                LocationMsgShow.getLocationMsg(MapActivity.this,marker,mBaiduMap,position);
-                ProgressUtils.hideProgress();
+            case 0x12://集装箱定位
+                LocationMsgShow.getLocationMsg(MapActivity.this,marker,mBaiduMap,markerPostion);
                 break;
             default://路线定位信息
-              LocationMsgShow.getRouteMsg(MapActivity.this,marker,mBaiduMap,latitude,longitude);
+             LocationMsgShow.getRouteMsg(MapActivity.this,marker,mBaiduMap,markerPostion,devicePosition);
                 break;
         }
         return true;
     }
-
-/*//listView的item事件
-    private class MyOnItemOnClickListener implements AdapterView.OnItemClickListener {
-
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            drawer.closeDrawer(GravityCompat.END);
-         *//*   requestDevices = new RequestDevices();
-            ArrayList<String> strings = new ArrayList<>();
-            ArrayList<DevicesInfo> strings1 = new ArrayList<>();
-            strings.add(MyApplication.nameDates.getUsername());
-            strings1.add(loginResponse.getDevices().get(position));
-            myposition = position;
-            requestDevices.setUserinfo(strings);
-            requestDevices.setDeviceID(strings1);*//*
-          *//*  *//**//**//**//*new Thread(new Runnable() {
-                @Override
-                public void run() {*//**//**//**//*
-                    ServelBiz.getDvices(requestDevices, MapActivity.this, handler);
-           *//**//**//**//*     }
-            }).start();*//**//**//**//**//*
-
-        }
-    }*/
-
 
     @Override
     protected void onStart() {
@@ -413,4 +365,6 @@ public class MapActivity extends MyActivity
         super.onResume();
         mapView.onResume();
     }
+
+
 }

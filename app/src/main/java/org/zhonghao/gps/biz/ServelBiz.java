@@ -1,21 +1,16 @@
 package org.zhonghao.gps.biz;
 
-import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.JsonRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
@@ -33,18 +28,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.zhonghao.gps.activity.MapActivity;
-import org.zhonghao.gps.activity.MoveLocusActivity;
 import org.zhonghao.gps.application.MyApplication;
-import org.zhonghao.gps.entity.DevicesInfo;
-import org.zhonghao.gps.entity.DevicesLocationMsg;
+import org.zhonghao.gps.entity.DevicesLocateInfo;
 import org.zhonghao.gps.entity.DevicesSelfLocation;
+import org.zhonghao.gps.entity.LoginResponse;
+import org.zhonghao.gps.entity.LoginResponseDevice;
 import org.zhonghao.gps.entity.NameDates;
-import org.zhonghao.gps.entity.RequestDevices;
 import org.zhonghao.gps.entity.RequestQueryDevicesMoveInfo;
-import org.zhonghao.gps.entity.ResponseDevicesMove;
+import org.zhonghao.gps.entity.ResponseDevicesMoveResult;
 import org.zhonghao.gps.entity.ResponseUserinfo;
-import org.zhonghao.gps.utils.Constants;
 import org.zhonghao.gps.utils.MyJsonResponse;
 import org.zhonghao.gps.utils.ProgressUtils;
 import org.zhonghao.gps.utils.Urls;
@@ -55,26 +47,25 @@ import org.zhonghao.gps.utils.Urls;
 
 public class ServelBiz {
 
-    public static DevicesInfo.LoginResponse LoginBiz(ResponseUserinfo responseUserinfo, Context context) {
-       // Log.d("serve", "LoginBiz: 进入了");
+    //登录信息
+    public static LoginResponse LoginBiz(ResponseUserinfo responseUserinfo, Context context) {
         URL url;
         HttpURLConnection connection;
         Gson gson = new Gson();
         try {
-            url = new URL(Constants.URL);
+            url = new URL(Urls.BASE_URL+Urls.LOGIN_URL);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("charset", "UTF-8");
             //将bean数据解析成json类型
             String jsonDate = gson.toJson(responseUserinfo);
-            Log.d("serve", "loginBiz:发出的json" + jsonDate);
             connection.setDoOutput(true);
             connection.setReadTimeout(5000);
             connection.setConnectTimeout(2000);
             //上传用户信息
             DataOutputStream out = new DataOutputStream(connection.getOutputStream());
             out.writeBytes(jsonDate);
-           // Log.d("serve", "loginBiz:得到的conn" + connection.getResponseCode());
+            Log.d("serve", "loginBiz:得到的conn" + connection.getResponseCode());
             if (connection.getResponseCode() == 200) {
                 BufferedReader bf = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
                 StringBuilder sb = new StringBuilder();
@@ -84,192 +75,67 @@ public class ServelBiz {
                     sb.append(line);
                 }
                 String response = sb.toString();
-               // Log.d("serve", "123loginBiz:得到的jason" + response);
-                DevicesInfo.LoginResponse loginResponse = gson.fromJson(response, DevicesInfo.LoginResponse.class);
-
-                JSONObject jsonObject1 = new JSONObject(response);
-                JSONArray deviceArr = jsonObject1.getJSONArray("devices");
-             //   Log.d("device", deviceArr.toString());
-                ArrayList<DevicesInfo> deviceList = new ArrayList();
-                for (int i = 0; i < deviceArr.length(); i++){
-                    JSONObject jsonObject = (JSONObject) deviceArr.get(i);
-                    DevicesInfo device = new DevicesInfo();
-                    device.setDeviceID(jsonObject.getString("deviceid"));
-                    device.setDeviceName(jsonObject.getString("devicename"));
-                    deviceList.add(device);
+                if(TextUtils.isEmpty(response)){
+                    Toast.makeText(context,"请求数据为空，请稍后再试",Toast.LENGTH_SHORT).show();
+                    return null;
+                }else {
+                    LoginResponse loginResponse = gson.fromJson(response, LoginResponse.class);
+                    JSONObject jsonObject1 = new JSONObject(response);
+                    JSONArray deviceArr = jsonObject1.getJSONArray("devices");
+                    ArrayList<LoginResponseDevice> deviceList = new ArrayList();
+                    for (int i = 0; i < deviceArr.length(); i++) {
+                        JSONObject jsonObject = (JSONObject) deviceArr.get(i);
+                        LoginResponseDevice device = new LoginResponseDevice();
+                        device.setDeviceID(jsonObject.getString("deviceid"));
+                        device.setDeviceName(jsonObject.getString("devicename"));
+                        deviceList.add(device);
+                    }
+                    loginResponse.setDevices(deviceList);
+                    MyApplication.myUserInnfo = loginResponse.getUserinfo();//用户信息
+                    MyApplication.loginResponse = loginResponse;//设备信息
+                    return loginResponse;
                 }
-                loginResponse.setDevices(deviceList);
-
-              //  Log.d("serve", "得到的User Info是=====" + gson.toJson(loginResponse.getUserinfo()));
-
-                MyApplication.myUserInnfo = loginResponse.getUserinfo();
-                return loginResponse;
             } else {
                 MyApplication.responseState = false;
             }
         } catch (Exception e) {
-          //  Log.d("serve", "j进入catch" + e.toString());
             MyApplication.responseState = false;
             e.printStackTrace();
             return null;
-        }finally {
         }
-        MyApplication.responseState = false;
         return null;
     }
-
-    public static void getDvices(RequestDevices requestDevices, Context context, final Handler handler) {
-       /* HttpURLConnection connection;
-        Gson gson = new Gson();
-        URL url;
-        ArrayList<DevicesInfo> list = new ArrayList<DevicesInfo>();
-        try {
-            url=new URL(Urls.DEVICE_DETAIL);
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("charset", "UTF-8");
-            String jsonDate = gson.toJson(requestDevices);
-         //   Log.d("serve", "123456loginBiz:发出的" + jsonDate);
-            connection.setDoOutput(true);
-            connection.setReadTimeout(5000);
-            connection.setConnectTimeout(5000);
-            DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-            out.writeBytes(jsonDate);
-            if (connection.getResponseCode() == 200) {
-             //   Log.d("serve", "456loginBiz:得到的conn" + connection.getResponseCode());
-                BufferedReader bf = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = bf.readLine()) != null) {
-                    sb.append(line);
-                }
-                String response = sb.toString();
-                JSONArray jsonArray = new JSONArray(response);
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject obj = jsonArray.getJSONObject(i);
-                    DevicesInfo deviceInfo = gson.fromJson(obj.toString(), DevicesInfo.class);
-                    list.add(deviceInfo);
-                }
-                Message msg = handler.obtainMessage();
-                msg.what = 1;
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("list",list);
-                msg.setData(bundle);
-                handler.sendMessage(msg);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            handler.sendEmptyMessage(5);
-        }finally {
-            return list;
-
-        }*/
-        final ArrayList<DevicesInfo> list = new ArrayList<DevicesInfo>();
-        Gson gson = new Gson();
-        String jsonDate = gson.toJson(requestDevices);
+    public static void getDvicesMoveLocus(RequestQueryDevicesMoveInfo requestDevicesMoveInfo, final Context context, final Handler handler, final int devicePosition) {
+        ProgressUtils.showProgress(MyApplication.context);//显示进度条
         RequestQueue queue= Volley.newRequestQueue(context);
-        MyJsonResponse res=new MyJsonResponse(Urls.DEVICE_DETAIL, new Response.Listener<JSONArray>() {
+        String jsonDate = MyApplication.gson.toJson(requestDevicesMoveInfo);
+        MyJsonResponse res=new MyJsonResponse(Urls.BASE_URL+Urls.DEVICE_ROUTE, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
-                for (int i = 0; i < response.length(); i++) {
-                    try {
-                        JSONObject object = response.getJSONObject(i);
-                        DevicesInfo deviceInfo = new Gson().fromJson(object.toString(),DevicesInfo.class);
-                        list.add(deviceInfo);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                Message msg = handler.obtainMessage();
-                msg.what = 1;
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("list",list);
-                msg.setData(bundle);
-                handler.sendMessage(msg);
-                ProgressUtils.hideProgress();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                handler.sendEmptyMessage(5);
-            }
-        },jsonDate);
-        queue.add(res);
-    }
-    public static void getDvicesMoveLocus(RequestQueryDevicesMoveInfo requestDevicesMove, final Context context, final Handler handler) {
-        /*URL url;
-        HttpURLConnection connection;
-        Gson gson = new Gson();
-        ArrayList<ResponseDevicesMove> list = new ArrayList<>();
-        ResponseDevicesMove responseDevicesMove = new ResponseDevicesMove();
-        try {
-            url = new URL("http://gps.zhonghaokeji.cn/NewGPSTrace2.0/app/appDeviceRoute.do");
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("charset", "UTF-8");
-            String jsonDate = gson.toJson(requestDevicesMove);
-            Log.d("serve", "123456loginBiz:发出的" + jsonDate);
-            connection.setDoOutput(true);
-            connection.setReadTimeout(10000);
-            connection.setConnectTimeout(10000);
-            DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-            out.writeBytes(jsonDate);
-          //  Log.d("serve", "456loginBiz:得到的conn" + connection.getResponseCode());
-            if (connection.getResponseCode() == 200) {
-                BufferedReader bf = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = bf.readLine()) != null) {
-                    sb.append(line);
-                }
-                String response = sb.toString();
-                JSONArray jsonArray = new JSONArray(response);
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject obj = jsonArray.getJSONObject(i);
-                    list.add(gson.fromJson(obj.toString(),ResponseDevicesMove.class));
-                }
-                responseDevicesMove = list.get(0);
-              //  Log.d("serve", "loginBiz:得到的jason" + response);
-                if (requestDevicesMove != null) {
-                    Message msg = handler.obtainMessage();
-                    msg.what = 2;
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable("response", responseDevicesMove);
-                    msg.setData(bundle);
-                    handler.sendMessage(msg);
-                    return list.get(0);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            handler.sendEmptyMessage(5);
-        }
-        return null;*/
-        final Gson gson = new Gson();
-        RequestQueue queue= Volley.newRequestQueue(context);
-        String jsonDate = gson.toJson(requestDevicesMove);
-        MyJsonResponse res=new MyJsonResponse(Urls.DEVICE_ROUTE, new Response.Listener<JSONArray>() {
-            @Override
-            public void onResponse(JSONArray response) {
-                ArrayList<ResponseDevicesMove> list = new ArrayList<>();
+                ArrayList<ResponseDevicesMoveResult> list = new ArrayList<>();
                 for (int i = 0; i < response.length(); i++) {
                     try {
                         JSONObject obj = response.getJSONObject(i);
-                        list.add(gson.fromJson(obj.toString(),ResponseDevicesMove.class));
+                        list.add(MyApplication.gson.fromJson(obj.toString(),ResponseDevicesMoveResult.class));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
                 //  Log.d("serve", "loginBiz:得到的jason" + response);
-
+                //请求过来是一个JsonArray格式的
+                Log.i("list",list.get(0).toString());
                 if (list.get(0) != null) {
+                    MyApplication.responseDevicesMove=list.get(0);
                     Message msg = handler.obtainMessage();
                     msg.what = 2;
                     Bundle bundle = new Bundle();
                     bundle.putSerializable("response", list.get(0));
-                    Log.i("response",list.get(0).toString());
+                    bundle.putSerializable("position",devicePosition);//传送过来的是一个deviceid号
                     msg.setData(bundle);
                     handler.sendMessage(msg);
+                }
+                else {
+                    Toast.makeText(context,"请求数据为空，请稍后再试",Toast.LENGTH_SHORT).show();
                 }
             }
         }, new Response.ErrorListener() {
@@ -277,21 +143,31 @@ public class ServelBiz {
             public void onErrorResponse(VolleyError error) {
                 handler.sendEmptyMessage(5);
             }
-        },jsonDate);
+        },jsonDate){
+
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Accept", "application/json");
+                headers.put("Content-Type", "application/json; charset=UTF-8");
+
+                return headers;
+            }
+        };
         queue.add(res);
     }
 
-    //设备定位信息请求
-    public static void getSelfLocation(Context context,int position) {
+    //设备定位信息请求,获取设备信息
+    public static void getSelfLocation(final Context context, final int position, LoginResponseDevice loginDevice) {
         final Handler handler=((MyApplication)context.getApplicationContext()).getMyHandler();
-        final List<DevicesInfo> deMsg=new ArrayList<>();
-        DevicesSelfLocation devices= MyApplication.devicesSelfLocation;
-        ArrayList<DevicesInfo> myDevice = MyApplication.myDevice;
-        NameDates nameDates =MyApplication.nameDates;
+        final List<DevicesLocateInfo> deMsg=new ArrayList<>();
+        DevicesSelfLocation devices= new DevicesSelfLocation();//上传的设备信息和用户名
+        NameDates nameDates =MyApplication.nameDates;//用户名信息等
         List<String> deviceID=new ArrayList<>();
         List<String> userinfo=new ArrayList<>();
-        deviceID.add(myDevice.get(position).getDeviceID());
-        userinfo.add(nameDates.getUsername());
+        deviceID.add(loginDevice.getDeviceID());//设备编号
+        userinfo.add(nameDates.getUsername());//用户名
+        //请求数据需上传的json数据
         devices.setDeviceID(deviceID);
         devices.setUserinfo(userinfo);
         String json = new Gson().toJson(devices);
@@ -303,21 +179,39 @@ public class ServelBiz {
                 for (int i = 0; i < response.length(); i++) {
                     try {
                         JSONObject object = response.getJSONObject(i);
-                        deMsg.add(new Gson().fromJson(object.toString(),DevicesInfo.class));
+                        deMsg.add(MyApplication.gson.fromJson(object.toString(),DevicesLocateInfo.class));//设备定位信息
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
-                MyApplication.devicesInfo=deMsg.get(0);
-                handler.sendEmptyMessage(0x11);
-        ProgressUtils.hideProgress();
+                //获取设备信息
+                if(deMsg!=null) {
+                    MyApplication.devicesLocate = deMsg.get(0);
+                    MyApplication.locatePosition = position;
+                    Message msg = Message.obtain();
+                    msg.obj = deMsg.get(0);
+                    msg.arg1 = position;
+                    msg.what = 0x11;
+                    handler.sendMessage(msg);
+                }else {
+                    Toast.makeText(context,"请求数据为空，请稍后再试",Toast.LENGTH_SHORT).show();
+                }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 handler.sendEmptyMessage(5);
             }
-        },json);
+        },json){
+
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Accept", "application/json");
+                headers.put("Content-Type", "application/json; charset=UTF-8");
+                return headers;
+            }
+        };
            queue.add(res);
     }
 }
