@@ -16,9 +16,12 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -26,11 +29,17 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.zhonghao.gps.R;
+import org.zhonghao.gps.adapter.WarningMsgAdapter;
 import org.zhonghao.gps.application.MyActivity;
+import org.zhonghao.gps.application.MyApplication;
 import org.zhonghao.gps.customView.ToggleText;
+import org.zhonghao.gps.entity.WarningResponseData;
+import org.zhonghao.gps.utils.MyJsonResponse;
 import org.zhonghao.gps.utils.Urls;
 import org.zhonghao.gps.utils.WarnIPopupWindow;
 
@@ -48,6 +57,8 @@ public class WarnInformationActivity extends MyActivity {
     @BindView(R.id.activity_warn_information)
     LinearLayout main;
     LayoutInflater inflater;
+    @BindView(R.id.empty_list)
+    TextView emptyList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,17 +74,20 @@ public class WarnInformationActivity extends MyActivity {
 
     //ToolBar代替ActionBar
     private void initActionBar() {
-        setSupportActionBar(toolBar);
+        toolBar.setTitle("预警信息");
         toolBar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);//不显示ActionBar的文字
+        setSupportActionBar(toolBar);
     }
     //设置listView
     ToggleText toggle;
+    WarningMsgAdapter adapter;
     private void initList() {
         View headView =inflater.inflate(R.layout.head_list_warn_infromation, null);
         toggle = (ToggleText) headView.findViewById(R.id.toggle_head_warn_information);
         list.addHeaderView(headView);
-        list.setAdapter(null);
+        adapter=new WarningMsgAdapter(this);
+        list.setAdapter(adapter);
+        list.setEmptyView(emptyList);
     }
     //监听事件
     private void initListener() {
@@ -93,22 +107,21 @@ public class WarnInformationActivity extends MyActivity {
     private void initData() {
         RequestQueue queue= Volley.newRequestQueue(this);
         HashMap<String,String> map=new HashMap<>();
-        map.put("time","2017-03-07 00:00:00");
+        map.put("time","2017-03-22 16:22:23");
         map.put("userinfo","admin");
-        JSONObject jsonObject=new JSONObject(map);
-        Log.i("json111",jsonObject.toString());
-        JsonObjectRequest request=new JsonObjectRequest(Request.Method.POST, Urls.BASE_URL + Urls.WARNING_URL, jsonObject, new Response.Listener<JSONObject>() {
+        JSONObject data=new JSONObject(map);
+        JsonObjectRequest request=new JsonObjectRequest(Request.Method.POST, Urls.BASE_URL + Urls.WARNING_URL, data, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                Log.i("re", response.toString());
+                WarningResponseData warningResponseData = MyApplication.gson.fromJson(response.toString(), WarningResponseData.class);
+                adapter.addData(warningResponseData);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.i("error", error.toString());
+
             }
-        }
-        );
+        });
         queue.add(request);
     }
 

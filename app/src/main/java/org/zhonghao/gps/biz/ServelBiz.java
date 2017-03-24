@@ -70,11 +70,11 @@ public class ServelBiz {
                 BufferedReader bf = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
                 StringBuilder sb = new StringBuilder();
                 String line;
-                MyApplication .responseState = true;
                 while ((line = bf.readLine()) != null) {
                     sb.append(line);
                 }
                 String response = sb.toString();
+                Log.i("tag",response);
                 if(TextUtils.isEmpty(response)){
                     Toast.makeText(context,"请求数据为空，请稍后再试",Toast.LENGTH_SHORT).show();
                     return null;
@@ -93,9 +93,10 @@ public class ServelBiz {
                     loginResponse.setDevices(deviceList);
                     MyApplication.myUserInnfo = loginResponse.getUserinfo();//用户信息
                     MyApplication.loginResponse = loginResponse;//设备信息
+                    //MyApplication .responseState = loginResponse.getState();
                     return loginResponse;
                 }
-            } else {
+            } else if(connection.getResponseCode()==500){//服务器请求异常
                 MyApplication.responseState = false;
             }
         } catch (Exception e) {
@@ -123,7 +124,7 @@ public class ServelBiz {
                 }
                 //  Log.d("serve", "loginBiz:得到的jason" + response);
                 //请求过来是一个JsonArray格式的
-                Log.i("list",list.get(0).toString());
+               // Log.i("list",list.get(0).toString());
                 if (list.get(0) != null) {
                     MyApplication.responseDevicesMove=list.get(0);
                     Message msg = handler.obtainMessage();
@@ -150,7 +151,6 @@ public class ServelBiz {
                 HashMap<String, String> headers = new HashMap<String, String>();
                 headers.put("Accept", "application/json");
                 headers.put("Content-Type", "application/json; charset=UTF-8");
-
                 return headers;
             }
         };

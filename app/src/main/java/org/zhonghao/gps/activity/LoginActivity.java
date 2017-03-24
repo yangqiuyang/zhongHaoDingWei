@@ -331,13 +331,13 @@ public class LoginActivity extends MyActivity implements LoaderCallbacks<Cursor>
                 startActivity(intent);
                 finish();
             } else {
-                if (MyApplication.responseState) {
+                /*if (MyApplication.responseState) {
                     mPasswordView.setError("用户名或密码不正确");
                     mPasswordView.requestFocus();
-                } else {
+                } else {*/
                     Toast.makeText(LoginActivity.this, "与服务器暂时连接不上，请休息下再试哦~", Toast.LENGTH_SHORT).show();
 
-                }
+               /* }*/
 
             }
         }

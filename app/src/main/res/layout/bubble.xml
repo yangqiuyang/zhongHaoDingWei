@@ -55,6 +55,12 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="24dp"
+            android:id="@+id/tv_devicesname"
+            android:gravity="left"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
             android:id="@+id/tv_devicesnum"
             android:gravity="left"
             />

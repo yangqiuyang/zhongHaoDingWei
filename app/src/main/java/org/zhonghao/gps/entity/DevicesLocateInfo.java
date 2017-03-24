@@ -11,15 +11,6 @@ public class DevicesLocateInfo implements Serializable{
     private String containerType;
     private String routeType;
     private String deviceID;
-
-    public String getDeviceName() {
-        return deviceName;
-    }
-
-    public void setDeviceName(String deviceName) {
-        this.deviceName = deviceName;
-    }
-
     private String deviceName;
     private String SendTime;
     private String userName;
@@ -28,6 +19,13 @@ public class DevicesLocateInfo implements Serializable{
     private String longitude;
     private String latitude;
     private String bindingTime;
+    public String getDeviceName() {
+        return deviceName;
+    }
+
+    public void setDeviceName(String deviceName) {
+        this.deviceName = deviceName;
+    }
 
     public String getBindingTime() {
         return bindingTime;

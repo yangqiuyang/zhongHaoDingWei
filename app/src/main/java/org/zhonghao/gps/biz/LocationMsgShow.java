@@ -49,6 +49,8 @@ public class LocationMsgShow {
         TextView lattitude = (TextView) bubbleLayout.findViewById(R.id.tv_Latitude_id);
         TextView longtitude = (TextView) bubbleLayout.findViewById(R.id.tv_Longtitude_id);
         final TextView address = (TextView) bubbleLayout.findViewById(R.id.tv_address_id);
+        TextView devicesname=(TextView) bubbleLayout.findViewById(R.id.tv_devicesname);
+
         Button query = (Button) bubbleLayout.findViewById(R.id.btn_query);
         query.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,13 +73,13 @@ public class LocationMsgShow {
         } else {
             route_type.setText("线路类型：回程");
         }
+        devicesname.setText("设备名："+MyApplication.loginResponse.getDevices().get(markerPostion).getDeviceName());
         devicesnum.setText("设备号：" + devicesInfo.getDeviceID());
         send_time.setText("发车时间: "+ devicesInfo.getSendTime());
         container_id.setText("集装箱号：" + devicesInfo.getContainerId());
         train_id.setText("班列号：" +devicesInfo.getTrainId());
         lattitude.setText("经度：" + devicesInfo.getLatitude().substring(0,5)+"°");
         longtitude.setText("纬度：" + devicesInfo.getLongitude().substring(0,5)+"°");
-      //
         //创建InfoWindow , 传入 view， 地理坐标， y 轴偏移量
         InfoWindow mInfoWindow = new InfoWindow(bubbleLayout, marker.getPosition(), -70);
         getAddress(context,address,mInfoWindow,mBaiduMap,devicesInfo);
@@ -136,6 +138,7 @@ public class LocationMsgShow {
         final TextView longtitudeTxt= (TextView) bubbleLayout.findViewById(R.id.longtitude);
         final TextView province= (TextView) bubbleLayout.findViewById(R.id.province);
         final TextView deviceNo= (TextView) bubbleLayout.findViewById(R.id.device_no_route);
+        final TextView deviceName= (TextView) bubbleLayout.findViewById(R.id.device_name_route);
         geoCoder.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
             @Override
             public void onGetGeoCodeResult(GeoCodeResult geoCodeResult) {
@@ -159,6 +162,7 @@ public class LocationMsgShow {
                         longtitudeTxt.setText(DecimalUtils.getDouble(latLng.longitude));
                         ArrayList<LoginResponseDevice> devices = MyApplication.loginResponse.getDevices();
                         deviceNo.setText(devices.get(devicePosition).getDeviceID());
+                        deviceName.setText(devices.get(devicePosition).getDeviceName());
                         mBaiduMap.showInfoWindow(mInfoWindow);
                         mBaiduMap.setOnMapClickListener(new BaiduMap.OnMapClickListener() {
                             @Override

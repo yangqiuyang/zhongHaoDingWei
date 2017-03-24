@@ -19,6 +19,7 @@
         android:textSize="15sp"
         android:textStyle="bold"
         android:layout_marginLeft="5dp"
+        android:textColor="#000"
         />
     <CheckBox
         android:layout_width="wrap_content"
@@ -53,6 +54,7 @@
             toggle:isSelected="true"
             toggle:selectedText="@string/complete_text"
             toggle:unSelectedText="@string/edit_text"
+            android:textColor="#000"
             />
     </RelativeLayout>
 </LinearLayout>

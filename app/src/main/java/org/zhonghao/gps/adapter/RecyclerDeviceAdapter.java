@@ -1,10 +1,12 @@
 package org.zhonghao.gps.adapter;
 
 import android.content.Context;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.zhonghao.gps.R;
@@ -34,7 +36,8 @@ public class RecyclerDeviceAdapter extends RecyclerView.Adapter<RecyclerDeviceAd
     }
     @Override
     public int getItemCount() {
-        return this.data!=null?this.data.getDevices().size():0;
+
+        return this.data!=null&&this.data.getDevices()!=null?this.data.getDevices().size():0;
     }
 
 
@@ -46,24 +49,29 @@ public class RecyclerDeviceAdapter extends RecyclerView.Adapter<RecyclerDeviceAd
     @Override
     public void onBindViewHolder(DeviceHolder holder, int position) {
         holder.deviceNo.setText(this.data.getDevices().get(position).getDeviceID());
+        holder.deviceName.setText(this.data.getDevices().get(position).getDeviceName());
     }
 
 
 
     public class DeviceHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        @BindView(R.id.device_num_list)
+        @BindView(R.id.device_no_list)
         TextView deviceNo;
+        @BindView(R.id.device_list_linear)
+        LinearLayout deviceList;
+        @BindView(R.id.device_name_list)
+        TextView deviceName;
         public DeviceHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);
-            deviceNo.setOnClickListener(this);
+            deviceList.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
             switch (v.getId()){
-                case R.id.device_num_list:
+                case R.id.device_list_linear:
                     ServelBiz.getSelfLocation(context,getAdapterPosition(), MyApplication.loginResponse.getDevices().get(getAdapterPosition()));
                     break;
             }

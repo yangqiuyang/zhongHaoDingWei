@@ -110,7 +110,7 @@ public class MapActivity extends MyActivity
                         }
                         break;
                     case 5:
-                        Toast.makeText(MapActivity.this,"数据请求失败，请稍后再试",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MapActivity.this,"数据请求失败,请稍后再试",Toast.LENGTH_SHORT).show();
                         ProgressUtils.hideProgress();
                         break;
                     case 7:
@@ -174,12 +174,17 @@ public class MapActivity extends MyActivity
 
     @BindView(R.id.lv_device_list)
     RecyclerView recycler;
+    @BindView(R.id.tv_nomore)
+    TextView deviceNomore;
     RecyclerDeviceAdapter adapter;
     private void initListView() {
         LinearLayoutManager manager=new LinearLayoutManager(this);
         recycler.setLayoutManager(manager);
         adapter=new RecyclerDeviceAdapter(this);
         recycler.setAdapter(adapter);
+        if(MyApplication.loginResponse==null||MyApplication.loginResponse.getDevices()==null){
+            deviceNomore.setVisibility(View.VISIBLE);
+        }
         adapter.addData(MyApplication.loginResponse);
 
     }
@@ -203,7 +208,7 @@ public class MapActivity extends MyActivity
         mUiSettings.setCompassEnabled(false);               //关闭指南针图层
         //普通地图
         mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
-        mBaiduMap.setMaxAndMinZoomLevel(19, 3);
+        mBaiduMap.setMaxAndMinZoomLevel(19, 4 );
         LatLng point = new LatLng(39.963175, 116.400244);
         MapStatus mapStatus = new MapStatus.Builder().zoom(8).target(point).build();
         MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mapStatus);

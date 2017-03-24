@@ -2,17 +2,50 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/device_list_linear"
     android:layout_width="match_parent"
-    android:layout_height="50dp"
+    android:layout_height="60dp"
     android:orientation="vertical"
     android:clickable="true"
+    android:background="#fff"
     >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:layout_weight="1"
+        android:layout_marginLeft="5dp"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:text="设备名: "
+            />
+        <TextView
+            android:id="@+id/device_name_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:layout_weight="1"
+        android:background="@drawable/device_bg_line"
+        android:layout_marginLeft="5dp"
+        >
     <TextView
         android:gravity="center_vertical"
-        android:text="TextView"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:id="@+id/device_num_list"
-        android:layout_marginLeft="5dp"
-        android:clickable="true"
+        android:text="设备ID: "
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         />
+        <TextView
+            android:id="@+id/device_no_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            />
+    </LinearLayout>
 </LinearLayout>
