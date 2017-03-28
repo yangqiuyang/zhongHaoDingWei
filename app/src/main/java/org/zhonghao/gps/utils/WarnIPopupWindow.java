@@ -12,6 +12,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import org.zhonghao.gps.R;
 
@@ -20,10 +21,28 @@ import org.zhonghao.gps.R;
  */
 
 public class WarnIPopupWindow extends PopupWindow {
+    public TextView markRead;
+    public TextView allMark;
+
+    public TextView getAllMark() {
+        return allMark;
+    }
+
+    public void setAllMark(TextView allMark) {
+        this.allMark = allMark;
+    }
+
+    public TextView getMarkRead() {
+        return markRead;
+    }
+
+    public void setMarkRead(TextView markRead) {
+        this.markRead = markRead;
+    }
+
     public WarnIPopupWindow(Context context) {
         this(context,null);
     }
-
     public WarnIPopupWindow(Context context, AttributeSet attrs) {
         this(context, attrs,0);
     }
@@ -41,6 +60,8 @@ public class WarnIPopupWindow extends PopupWindow {
         setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         /*setOutsideTouchable(true);
         setBackgroundDrawable(new ColorDrawable(Color.GRAY));//设置窗体背景色*/
+        markRead= (TextView) view.findViewById(R.id.mark_read);
+        allMark= (TextView) view.findViewById(R.id.all_mark);
     }
     public void show(View view){
          setAnimationStyle(R.style.pop_show);

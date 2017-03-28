@@ -23,6 +23,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
@@ -34,6 +40,7 @@ import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.UiSettings;
 import com.baidu.mapapi.model.LatLng;
 
+import org.json.JSONObject;
 import org.zhonghao.gps.R;
 import org.zhonghao.gps.adapter.RecyclerDeviceAdapter;
 import org.zhonghao.gps.application.MyActivity;
@@ -46,9 +53,12 @@ import org.zhonghao.gps.entity.RequestDevices;
 import org.zhonghao.gps.entity.ResponseDevicesMoveResult;
 import org.zhonghao.gps.entity.UpdateInfo;
 import org.zhonghao.gps.biz.LocationMsgShow;
+import org.zhonghao.gps.entity.WarningResponseData;
 import org.zhonghao.gps.utils.ProgressUtils;
+import org.zhonghao.gps.utils.Urls;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -138,6 +148,7 @@ public class MapActivity extends MyActivity
         setContentView(R.layout.activity_map);
         ButterKnife.bind(this);
         initToolBar();
+        initWarning();
         initDrawer();
         initMap();
         initListView();
@@ -146,6 +157,8 @@ public class MapActivity extends MyActivity
         myApplication.setMyHandler(handler);
         MyApplication.context=MapActivity.this;
     }
+
+
     //侧滑菜单
     @BindView(R.id.drawer_layout)
     DrawerLayout drawer ;
@@ -259,13 +272,14 @@ public class MapActivity extends MyActivity
     }
 
     //最右侧，中浩科技，加载出我的设备
+    WarningResponseData message;
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_more){
         drawer.openDrawer(GravityCompat.END);}
         if(item.getItemId()==R.id.action_warning){
-            Intent intent=new Intent(this,WarnInformationActivity.class);
-            startActivity(intent);
+                Intent intent = new Intent(this, WarnInformationActivity.class);
+                startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
@@ -371,5 +385,26 @@ public class MapActivity extends MyActivity
         mapView.onResume();
     }
 
+    //警告信息请求完后才能跳转，不然预警可能没数据
+    public void initWarning() {
+       /* RequestQueue queue= Volley.newRequestQueue(this);
+        HashMap<String,String> map=new HashMap<>();
+        map.put("userinfo",MyApplication.nameDates.getUsername());
+        JSONObject data=new JSONObject(map);
+        JsonObjectRequest request=new JsonObjectRequest(Request.Method.POST, Urls.BASE_URL + Urls.WARNING_URL, data, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                message = MyApplication.gson.fromJson(String.valueOf(response.optJSONObject("message")), WarningResponseData.class);
+                MyApplication.warnResponseData=message;
+                //EventBus.getDefault().post(new MyEvent(message));
 
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                ProgressUtils.hideProgress();//隐藏进度条
+            }
+        });
+        queue.add(request);*/
+    }
 }

@@ -9,7 +9,6 @@ import com.baidu.mapapi.model.LatLng;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
-
 import org.xutils.x;
 import org.zhonghao.gps.entity.DevicesLocateInfo;
 import org.zhonghao.gps.entity.DevicesLocationMsg;
@@ -19,6 +18,7 @@ import org.zhonghao.gps.entity.NameDates;
 import org.zhonghao.gps.entity.RequestQueryDevicesMoveInfo;
 import org.zhonghao.gps.entity.ResponseDevicesMoveResult;
 import org.zhonghao.gps.entity.UserInfo;
+import org.zhonghao.gps.entity.WarningResponseData;
 
 /**
  * Created by lenovo on 2016/11/28.
@@ -40,6 +40,7 @@ public class MyApplication extends Application {
     public static ResponseDevicesMoveResult responseDevicesMove=new ResponseDevicesMoveResult();//请求的轨迹数据
     public static RequestQueryDevicesMoveInfo DevicesMoveInfo=new RequestQueryDevicesMoveInfo();//集装箱路线信息类
     public static LatLng point = new LatLng(34.73412, 113.79439);//定位郑州
+    public static WarningResponseData warnResponseData=new WarningResponseData();//请求的预警信息
     public Handler myHandler = null;
     public Handler getMyHandler() {
         return myHandler;
@@ -56,6 +57,5 @@ public class MyApplication extends Application {
         x.Ext.init(this);
 
     }
-
 
 }

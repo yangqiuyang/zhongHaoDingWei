@@ -4,7 +4,7 @@
               android:orientation="vertical"
               android:background="#F5F5F5"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="wrap_content">
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="50dp"
@@ -38,8 +38,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:background="@drawable/line"
         android:gravity="center_vertical"
+        android:background="#fff"
         >
         <org.zhonghao.gps.customView.ToggleText
             android:id="@+id/toggle_head_warn_information"

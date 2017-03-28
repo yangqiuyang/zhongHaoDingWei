@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,17 +32,30 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import org.json.JSONObject;
 import org.zhonghao.gps.R;
 import org.zhonghao.gps.application.MyActivity;
 import org.zhonghao.gps.application.MyApplication;
 import org.zhonghao.gps.biz.ServelBiz;
 import org.zhonghao.gps.entity.LoginResponse;
+import org.zhonghao.gps.entity.MyEvent;
 import org.zhonghao.gps.entity.NameDates;
 import org.zhonghao.gps.entity.ResponseUserinfo;
+import org.zhonghao.gps.entity.WarningResponseData;
+import org.zhonghao.gps.utils.ISendData;
 import org.zhonghao.gps.utils.ProgressUtils;
+import org.zhonghao.gps.utils.Urls;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
 
 import static org.zhonghao.gps.application.MyApplication.nameDates;
 
@@ -173,7 +187,7 @@ public class LoginActivity extends MyActivity implements LoaderCallbacks<Cursor>
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            ProgressUtils.showProgress(this);
+
             editor = pref.edit();
             if (automatic.isChecked()) {
                 editor = pref.edit();
@@ -190,6 +204,7 @@ public class LoginActivity extends MyActivity implements LoaderCallbacks<Cursor>
                 editor.clear();
             }
             editor.commit();
+            ProgressUtils.showProgress(this);
             mAuthTask = new UserLoginTask(username, password);
             mAuthTask.execute((Void) null);
         }
@@ -311,7 +326,6 @@ public class LoginActivity extends MyActivity implements LoaderCallbacks<Cursor>
                  loginResponse = ServelBiz.LoginBiz(responseUserinfo, LoginActivity.this);
                  Thread.sleep(2000);
                  return loginResponse.getState();
-
             } catch (Exception e) {
                 return false;
             }
@@ -324,20 +338,11 @@ public class LoginActivity extends MyActivity implements LoaderCallbacks<Cursor>
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
-            ProgressUtils.hideProgress();//隐藏进度条
             if (success) {
-                Intent intent = new Intent(LoginActivity.this, MapActivity.class);
-                intent.setClass(LoginActivity.this, MapActivity.class);
-                startActivity(intent);
-                finish();
+            initWarning();
             } else {
-                /*if (MyApplication.responseState) {
-                    mPasswordView.setError("用户名或密码不正确");
-                    mPasswordView.requestFocus();
-                } else {*/
                     Toast.makeText(LoginActivity.this, "与服务器暂时连接不上，请休息下再试哦~", Toast.LENGTH_SHORT).show();
-
-               /* }*/
+                    ProgressUtils.hideProgress();//隐藏进度条
 
             }
         }
@@ -345,8 +350,31 @@ public class LoginActivity extends MyActivity implements LoaderCallbacks<Cursor>
         @Override
         protected void onCancelled() {
             mAuthTask = null;
-            showProgress(false);
         }
     }
+    public void initWarning() {
+        RequestQueue queue= Volley.newRequestQueue(this);
+        HashMap<String,String> map=new HashMap<>();
+        map.put("userinfo",MyApplication.nameDates.getUsername());
+        JSONObject data=new JSONObject(map);
+        JsonObjectRequest request=new JsonObjectRequest(Request.Method.POST, Urls.BASE_URL + Urls.WARNING_URL, data, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                MyApplication.warnResponseData = MyApplication.gson.fromJson(String.valueOf(response.optJSONObject("message")), WarningResponseData.class);
+                Log.i("response", String.valueOf(response));
+                Intent intent = new Intent(LoginActivity.this, MapActivity.class);
+                startActivity(intent);
+                ProgressUtils.hideProgress();//隐藏进度条
+                finish();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                ProgressUtils.hideProgress();//隐藏进度条
+            }
+        });
+        queue.add(request);
+    }
+
 }
 

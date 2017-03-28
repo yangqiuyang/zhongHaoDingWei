@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#fff"
     tools:context="org.zhonghao.gps.activity.WarnInformationActivity">
 
     <android.support.v7.widget.Toolbar
@@ -19,13 +18,22 @@
         android:gravity="center"
         >
     </android.support.v7.widget.Toolbar>
+    <include layout="@layout/head_list_warn_infromation"
+             android:layout_height="wrap_content"
+             android:layout_width="match_parent"
+        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#ccc"
+        ></LinearLayout>
     <ListView
         android:id="@+id/list_warn_information"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        >
-    </ListView>
-    <TextView
+        android:background="#fff"
+      />
+   <TextView
         android:id="@+id/empty_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

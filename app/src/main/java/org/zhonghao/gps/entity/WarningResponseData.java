@@ -1,12 +1,13 @@
 package org.zhonghao.gps.entity;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by Administrator on 2017/3/24.
  */
 
-public class WarningResponseData {
+public class WarningResponseData implements Serializable{
 
     /**
      * receiver : glb
@@ -44,9 +45,9 @@ public class WarningResponseData {
             this.alarmList = alarmList;
         }
 
-        public static class AlarmListBean {
-            private int alarmID;
-            private int alarmType;
+        public static class AlarmListBean implements Serializable{
+            private String alarmID;
+            private String alarmType;
             private String baseStation1;
             private String imei;
             private double latitude;
@@ -55,19 +56,19 @@ public class WarningResponseData {
             private String ringState;
             private String time;
 
-            public int getAlarmID() {
+            public String getAlarmID() {
                 return alarmID;
             }
 
-            public void setAlarmID(int alarmID) {
+            public void setAlarmID(String alarmID) {
                 this.alarmID = alarmID;
             }
 
-            public int getAlarmType() {
+            public String getAlarmType() {
                 return alarmType;
             }
 
-            public void setAlarmType(int alarmType) {
+            public void setAlarmType(String alarmType) {
                 this.alarmType = alarmType;
             }
 
@@ -126,6 +127,28 @@ public class WarningResponseData {
             public void setTime(String time) {
                 this.time = time;
             }
+
+            @Override
+            public String toString() {
+                return "AlarmListBean{" +
+                        "alarmID='" + alarmID + '\'' +
+                        ", alarmType='" + alarmType + '\'' +
+                        ", baseStation1='" + baseStation1 + '\'' +
+                        ", imei='" + imei + '\'' +
+                        ", latitude=" + latitude +
+                        ", longitude=" + longitude +
+                        ", readState='" + readState + '\'' +
+                        ", ringState='" + ringState + '\'' +
+                        ", time='" + time + '\'' +
+                        '}';
+            }
         }
 
+    @Override
+    public String toString() {
+        return "WarningResponseData{" +
+                "receiver='" + receiver + '\'' +
+                ", alarmList=" + alarmList +
+                '}';
+    }
 }
