@@ -120,7 +120,7 @@ public class MapActivity extends MyActivity
                         }
                         break;
                     case 5:
-                        Toast.makeText(MapActivity.this,"数据请求失败,请稍后再试",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MapActivity.this,"该设备暂无数据信息",Toast.LENGTH_SHORT).show();
                         ProgressUtils.hideProgress();
                         break;
                     case 7:
@@ -246,8 +246,8 @@ public class MapActivity extends MyActivity
     @BindView(R.id.user_home_toolbar)
     Toolbar toolbarDevices;
     private void initToolBar() {
-        toolbarDevices.setTitle("我的设备");
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
 

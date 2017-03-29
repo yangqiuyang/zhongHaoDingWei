@@ -23,8 +23,8 @@ public class BusinessServerActivity extends MyActivity {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_business_server);
         ButterKnife.bind(this);
-        toolbar.setTitle("关于我们");
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
     }
     float x1 = 0;

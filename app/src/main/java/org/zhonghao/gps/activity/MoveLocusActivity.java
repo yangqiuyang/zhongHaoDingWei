@@ -140,9 +140,9 @@ public class MoveLocusActivity extends AppCompatActivity {
     }
 
     private void initTool() {
-        toolbar.setTitle("轨迹查询");
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
     //设置的设备地址

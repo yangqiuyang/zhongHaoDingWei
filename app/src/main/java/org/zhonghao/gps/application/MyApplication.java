@@ -2,13 +2,17 @@ package org.zhonghao.gps.application;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.model.LatLng;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import org.xutils.x;
 import org.zhonghao.gps.entity.DevicesLocateInfo;
 import org.zhonghao.gps.entity.DevicesLocationMsg;
@@ -19,6 +23,8 @@ import org.zhonghao.gps.entity.RequestQueryDevicesMoveInfo;
 import org.zhonghao.gps.entity.ResponseDevicesMoveResult;
 import org.zhonghao.gps.entity.UserInfo;
 import org.zhonghao.gps.entity.WarningResponseData;
+
+import cn.jpush.android.api.JPushInterface;
 
 /**
  * Created by lenovo on 2016/11/28.
@@ -40,7 +46,7 @@ public class MyApplication extends Application {
     public static ResponseDevicesMoveResult responseDevicesMove=new ResponseDevicesMoveResult();//请求的轨迹数据
     public static RequestQueryDevicesMoveInfo DevicesMoveInfo=new RequestQueryDevicesMoveInfo();//集装箱路线信息类
     public static LatLng point = new LatLng(34.73412, 113.79439);//定位郑州
-    public static WarningResponseData warnResponseData=new WarningResponseData();//请求的预警信息
+    public static List<WarningResponseData> warnResponseData=new ArrayList<>();//请求的预警信息
     public Handler myHandler = null;
     public Handler getMyHandler() {
         return myHandler;
@@ -50,11 +56,27 @@ public class MyApplication extends Application {
         this.myHandler = myHandler;
     }
 
+    SharedPreferences mPreferences;
     @Override
     public void onCreate() {
         super.onCreate();
+        //百度地图
         SDKInitializer.initialize(this);
+        //xutils
         x.Ext.init(this);
+        //极光推送
+       // JPushInterface.setDebugMode(true);
+        mPreferences= PreferenceManager.getDefaultSharedPreferences(this);
+        boolean jpushAllow = mPreferences.getBoolean("jpushAllow", false);
+        JPushInterface.init(this);
+        JPushInterface.setLatestNotificationNumber(this,5);//设置最多显示5条未读
+        //设置是否接收极光推送消息
+        if(jpushAllow){
+            JPushInterface.resumePush(this);
+        }
+        else {
+            JPushInterface.stopPush(this);
+        }
 
     }
 

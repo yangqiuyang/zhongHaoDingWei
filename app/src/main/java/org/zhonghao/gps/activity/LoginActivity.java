@@ -38,6 +38,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.zhonghao.gps.R;
 import org.zhonghao.gps.application.MyActivity;
@@ -49,6 +51,7 @@ import org.zhonghao.gps.entity.NameDates;
 import org.zhonghao.gps.entity.ResponseUserinfo;
 import org.zhonghao.gps.entity.WarningResponseData;
 import org.zhonghao.gps.utils.ISendData;
+import org.zhonghao.gps.utils.MyJsonResponse;
 import org.zhonghao.gps.utils.ProgressUtils;
 import org.zhonghao.gps.utils.Urls;
 
@@ -58,6 +61,7 @@ import java.util.List;
 
 
 import static org.zhonghao.gps.application.MyApplication.nameDates;
+import static org.zhonghao.gps.application.MyApplication.warnResponseData;
 
 /**
  * A login screen that offers login via user_name/password.
@@ -79,7 +83,6 @@ public class LoginActivity extends MyActivity implements LoaderCallbacks<Cursor>
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
     private CheckBox rememberPass, automatic;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -323,8 +326,8 @@ public class LoginActivity extends MyActivity implements LoaderCallbacks<Cursor>
 
             try {
                 // Simulate network access.
+               // initWarning();
                  loginResponse = ServelBiz.LoginBiz(responseUserinfo, LoginActivity.this);
-                 Thread.sleep(2000);
                  return loginResponse.getState();
             } catch (Exception e) {
                 return false;
@@ -339,10 +342,17 @@ public class LoginActivity extends MyActivity implements LoaderCallbacks<Cursor>
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
             if (success) {
-            initWarning();
+                //initWarning();
+                jumpIntent();
+
             } else {
+                /*if (MyApplication.responseState) {
+                    mPasswordView.setError("用户名或密码不正确");
+                    mPasswordView.requestFocus();
+                } else {*/
                     Toast.makeText(LoginActivity.this, "与服务器暂时连接不上，请休息下再试哦~", Toast.LENGTH_SHORT).show();
                     ProgressUtils.hideProgress();//隐藏进度条
+               /* }*/
 
             }
         }
@@ -352,28 +362,12 @@ public class LoginActivity extends MyActivity implements LoaderCallbacks<Cursor>
             mAuthTask = null;
         }
     }
-    public void initWarning() {
-        RequestQueue queue= Volley.newRequestQueue(this);
-        HashMap<String,String> map=new HashMap<>();
-        map.put("userinfo",MyApplication.nameDates.getUsername());
-        JSONObject data=new JSONObject(map);
-        JsonObjectRequest request=new JsonObjectRequest(Request.Method.POST, Urls.BASE_URL + Urls.WARNING_URL, data, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                MyApplication.warnResponseData = MyApplication.gson.fromJson(String.valueOf(response.optJSONObject("message")), WarningResponseData.class);
-                Log.i("response", String.valueOf(response));
-                Intent intent = new Intent(LoginActivity.this, MapActivity.class);
-                startActivity(intent);
-                ProgressUtils.hideProgress();//隐藏进度条
-                finish();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                ProgressUtils.hideProgress();//隐藏进度条
-            }
-        });
-        queue.add(request);
+
+    private void jumpIntent() {
+        Intent intent = new Intent(LoginActivity.this, MapActivity.class);
+        startActivity(intent);
+        ProgressUtils.hideProgress();//隐藏进度条
+        finish();
     }
 
 }

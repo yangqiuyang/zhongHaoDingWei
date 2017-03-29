@@ -11,6 +11,7 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import org.zhonghao.gps.R;
+import org.zhonghao.gps.adapter.WarningMsgAdapter;
 import org.zhonghao.gps.utils.WarnIPopupWindow;
 
 /**
@@ -34,9 +35,18 @@ public class ToggleText extends CheckBox {
          selectedText=array.getString(R.styleable.ToggleText_selectedText);
          unSelectedText=array.getString(R.styleable.ToggleText_unSelectedText);
          this.setText(unSelectedText);
-        // isSelected=array.getBoolean(R.styleable.ToggleText_isSelected,true);
          array.recycle();
          initListener();
+    }
+    //设置Adapter
+    public  WarningMsgAdapter adapter;
+
+    public WarningMsgAdapter getAdapter() {
+        return adapter;
+    }
+
+    public void setAdapter(WarningMsgAdapter adapter) {
+        this.adapter = adapter;
     }
 
     private void initListener() {
@@ -52,6 +62,7 @@ public class ToggleText extends CheckBox {
                     pop.setAnimationStyle(R.style.pop_show);
                     pop.showAtLocation(v, Gravity.BOTTOM,0,0);
                 }
+                adapter.addCheck(isChecked);
             }
         });
     }

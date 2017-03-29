@@ -15,7 +15,17 @@
         android:theme="?attr/actionBarTheme"
         android:minHeight="?attr/actionBarSize"
         app:popupTheme="@style/AppTheme.PopupOverlay"
-        android:id="@+id/sp_move_toolbar" />
+        android:id="@+id/sp_move_toolbar" >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="轨迹查询"
+            android:textSize="20sp"
+            android:textColor="#fff"
+            android:layout_gravity="center"
+            />
+        </android.support.v7.widget.Toolbar>
     <LinearLayout
 
         android:paddingLeft="@dimen/activity_horizontal_margin"

@@ -17,5 +17,6 @@ public class MyActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
        // StatusBarUtil.setColor(this, R.color.status_bar);
+
     }
 }

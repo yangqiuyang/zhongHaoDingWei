@@ -21,9 +21,9 @@ public class AboutUsActivity extends MyActivity {
         setContentView(R.layout.activity_about_us);
         Toolbar toolbar = (Toolbar) findViewById(R.id.about_us_toolbar);
 //        toolbar.addView(View.inflate(MapActivity.this,R.layout.list_layout,null),0);
-        toolbar.setTitle("关于");
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         TextView version = (TextView) findViewById(R.id.tv_version);
         try {
             version.setText(org.zhonghao.gps.biz.Tools.getCurrentVersion(AboutUsActivity.this));

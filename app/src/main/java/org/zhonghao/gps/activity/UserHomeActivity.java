@@ -35,9 +35,9 @@ public class UserHomeActivity extends MyActivity {
         myApplication = (MyApplication) this.getApplicationContext();
         handler = myApplication.getMyHandler();
         Toolbar toolbar = (Toolbar) findViewById(R.id.user_home_toolbar);
-        toolbar.setTitle("个人中心");
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

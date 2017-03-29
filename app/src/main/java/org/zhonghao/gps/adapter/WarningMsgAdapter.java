@@ -1,6 +1,7 @@
 package org.zhonghao.gps.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +16,11 @@ import android.widget.Toast;
 import org.zhonghao.gps.R;
 import org.zhonghao.gps.entity.WarningMark;
 import org.zhonghao.gps.entity.WarningResponseData;
+import org.zhonghao.gps.utils.MyOnCheckedChangeListener;
 import org.zhonghao.gps.utils.MyOnClickListener;
 import org.zhonghao.gps.utils.Urls;
 
+import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -29,29 +32,32 @@ import butterknife.ButterKnife;
 
 public class WarningMsgAdapter extends BaseAdapter {
     Context context;
-    WarningResponseData data;
+    List<WarningResponseData> data;
     LayoutInflater inflate;
-    Map<Integer,Boolean> checkedMap;
-    WarningMark mark;
+    boolean isChecked;
     public WarningMsgAdapter(Context context) {
         this.context=context;
         inflate=LayoutInflater.from(context);
     }
 
-    public void addData(WarningResponseData data, Map<Integer, Boolean> checkedMap, WarningMark mark) {
+    public void addData(List<WarningResponseData> data) {
         this.data=data;
-        this.checkedMap=checkedMap;
-        this.mark=mark;
         notifyDataSetChanged();
     }
+    //设置选中栏是否显示
+    public void addCheck(boolean isChecked) {
+        this.isChecked=isChecked;
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getCount() {
-        return this.data!=null&&this.data.getAlarmList()!=null?this.data.getAlarmList().size():0;
+        return this.data!=null?this.data.size():0;
     }
 
     @Override
     public Object getItem(int position) {
-        return this.data.getAlarmList().get(position);
+        return this.data.get(position);
     }
 
     @Override
@@ -71,51 +77,65 @@ public class WarningMsgAdapter extends BaseAdapter {
         else{
             holder = (WarningHolder) convertView.getTag();
         }
-        final WarningResponseData.AlarmListBean alarm = data.getAlarmList().get(position);
+        WarningResponseData.AlarmListBean alarm = this.data.get(position).getAlarmList().get(0);
+      //设备的IMEI号
         holder.deviceName.setText(String.valueOf(alarm.getImei()));
        //预警类型
-        if(alarm.getAlarmType().equals("0")){
+        if(alarm.getAlarmType().equals(Urls.RAIL_TYPE)){
             holder.ringState.setText(Urls.ALARMTYPE_RAIL);
         }
-        else if(alarm.getAlarmType().equals("1")){
+        else if(alarm.getAlarmType().equals(Urls.Light_TYPE)){
             holder.ringState.setText(Urls.ALARMTYPE_Light);
         }
-        else if(alarm.getAlarmType().equals("2")){
+        else if(alarm.getAlarmType().equals(Urls.RAIL_LIGHT_TYPE)){
             holder.ringState.setText(Urls.ALARMTYPE_RAIL_Light);
         }
-        //通知状态
-        if(alarm.getReadState().equals("0")){
+        //通知状态,是否已读状态
+        if(alarm.getReadState().equals(Urls.UNREAD_TYPE)){
             holder.readState.setText(Urls.UNREAD);
         }
-        else if(alarm.getReadState().equals("1")){
+        else if(alarm.getReadState().equals(Urls.READ_TYPE)){
             holder.readState.setText(Urls.READ);
         }
+        //消息的时间
         holder.time.setText(String.valueOf(alarm.getTime()));
         //是否阅读信息
         holder.warningContent.setOnClickListener(new MyOnClickListener(position){
             @Override
             public void onClick(View v) {
-                Toast.makeText(context,"你好"+position,Toast.LENGTH_LONG).show();
-                data.getAlarmList().get(this.mPosition).setReadState(Urls.READ);
+                data.get(mPosition).getAlarmList().get(0).setReadState(Urls.READ);
                 notifyDataSetChanged();
             }
         });
-        holder.checkMsg.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        //设置选中框是否显示
+        if(isChecked){
+            holder.checkMsg.setVisibility(View.VISIBLE);
+        }
+        else{
+            holder.checkMsg.setVisibility(View.GONE);
+        }
+        //设置标记是否已经选中
+        if(alarm.getReadState().equals(Urls.READ_TYPE)){
+            holder.checkMsg.setChecked(true);
+        } else if (alarm.getReadState().equals(Urls.UNREAD_TYPE)) {
+            holder.checkMsg.setChecked(false);
+        }
+        //更改是否已读状态
+        holder.checkMsg.setOnCheckedChangeListener(new MyOnCheckedChangeListener(position){
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                WarningResponseData.AlarmListBean alarmBean = data.get(mPosition).getAlarmList().get(0);
                 if(isChecked){
-                    checkedMap.put(position,Urls.CHECKED);
-                    mark.setAlarmID(alarm.getAlarmID());
-                    mark.setReadState(String.valueOf(Urls.READ_TYPE));
+                  alarmBean.setReadState(Urls.READ_TYPE);
                 }
                 else{
-                    checkedMap.put(position,Urls.UNCHECKED);
+                    alarmBean.setReadState(Urls.UNREAD_TYPE);
                 }
+                notifyDataSetChanged();
             }
         });
         return convertView;
     }
-
 
     static class WarningHolder{
         @BindView(R.id.check_msg_warning)
